@@ -23,10 +23,10 @@ import tank
 
 
 ENGINES = {
-    'tk-houdini': 'houdini',
-    'tk-maya': 'maya',
-    'tk-nuke': 'nuke',
-    'tk-nukestudio': 'nuke',
+    'tk-houdini' : 'houdini',
+    'tk-maya' : 'maya',
+    'tk-nuke' : 'nuke',
+    'tk-nukestudio' : 'nuke',
     'tk-mari' : 'mari',
     'tk-clarisse' : 'clarisse',
     'tk-unreal' : 'unreal'
@@ -71,6 +71,13 @@ class AppLaunch(tank.Hook):
         if (depart['name'] == 'RND' and engine_name == 'tk-nuke') or depart['name'] in ['General']:
             depart_confirm = True
 
+
+        # if sys.version_info.major == 3 and sys.version_info.minor == 11 and app_name == 'unreal':
+        #     now_dir = os.path.dirname(os.path.abspath(__file__))
+        #     packages = os.path.join(now_dir, 'packages')
+
+        #     sys.path.append(packages)
+
         if depart_confirm:
             adapter = get_adapter(platform.system())
             packages = get_rez_packages(sg, app_name, version, system, project)
@@ -90,7 +97,8 @@ class AppLaunch(tank.Hook):
             from rez import resolved_context
 
             if not packages or app_name == 'unreal':
-                self.logger.debug('No rez packages were found. The default boot, instead.')
+                if not packages:
+                    self.logger.debug('No rez packages were found. The default boot, instead.')
                 command = adapter.get_command(app_path, app_args)
                 return_code = os.system(command)
                 return {'command': command, 'return_code': return_code}
