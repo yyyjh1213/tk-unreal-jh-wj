@@ -49,6 +49,9 @@ keys:
        type: int
        format_spec: "04"
        alias: version
+    version_two:
+       type: int
+       format_spec: "02"
     timestamp:
         type: str
     width:
@@ -136,8 +139,22 @@ keys:
         choices:
             ma: Maya Ascii (.ma)
             mb: Maya Binary (.mb)
-        default: ma
+        default: mb
         alias: extension
+    tail:
+        type: str
+    asset_namespace:
+        type: str
+
+    shot_file_extension:
+        type: str
+        choices:
+            usd: USD
+            abc: Alembic
+            ma: Maya Ascii
+            mb: Maya Binary
+    number:
+        type: int
 
     # needed by the Alias import as reference functionality
     alias.extension:
