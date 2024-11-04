@@ -72,11 +72,11 @@ class AppLaunch(tank.Hook):
             depart_confirm = True
 
 
-        # if sys.version_info.major == 3 and sys.version_info.minor == 11 and app_name == 'unreal':
-        #     now_dir = os.path.dirname(os.path.abspath(__file__))
-        #     packages = os.path.join(now_dir, 'packages')
+        if sys.version_info.major == 3 and app_name == 'unreal' and system == 'Windows':
+            now_dir = os.path.dirname(os.path.abspath(__file__))
+            packages = os.path.join(now_dir, 'packages', 'win')
 
-        #     sys.path.append(packages)
+            sys.path.append(packages)
 
         if depart_confirm:
             adapter = get_adapter(platform.system())
