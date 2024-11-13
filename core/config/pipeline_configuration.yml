@@ -1,0 +1,3 @@
+# pipeline_configuration.yml
+
+windows_path: "c:/shotgrid_config/tk-config-unreal_ww"    # 정방향 슬래시 사용

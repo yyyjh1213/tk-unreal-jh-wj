@@ -61,6 +61,110 @@ keys:
     segment_name:
         type: str
 
+    #2차 폴더 스트럭쳐 구조
+    #{project}/{task}/assets/{asset_type}/{asset}/{step}/dev/{DCCtool}/{ext}/{asset}.{step}.v{version}.{ext}
+    
+    #프로젝트 관련
+    Project:
+        type: str
+        shotgun_entity_type: Project
+        shotgun_field_name: name
+        #shotgun_filters: - [is_active, "is", True]
+
+    # Task 관련
+    Task:
+        type: str
+        shotgun_entity_type: Task
+        shotgun_field_name: content
+        values:
+            - modeling
+            - rig
+            - texture
+            - concept
+            - layout
+            - previs
+            - ue
+
+    #버전 관련
+    Version:
+        type: int
+        format_spec: "v%03d" #v001,v002 형식으로 표현
+        shotgun_entity_type: Version
+        shotgun_field_name: version_number
+        default: 1
+
+    #Asset_type 관련
+    Sg_asset_type:
+        type: str
+        shotgun_entity_type: Asset
+        shotgun_field_name: sg_asset_type
+        values:
+            - char
+            - prop
+            - env
+            - veh
+    #asset 관련
+    Asset:
+        type: str
+        shotgun_entity_type: Asset
+        shotgun_field_name: code
+        values:
+            - model
+            - rig
+            - texture
+            - concept
+            - layout
+    #DCCtool
+    DCCtool:
+        type: str
+        values:
+            - maya
+            - houdini
+            - nuke
+            - substance
+            - photoshop
+            - zbrush
+        default: maya
+    #ext
+    Ext:
+        type: str
+        choices:
+            - mb
+            - ma
+            - hip
+            - nk
+            - spp
+            - psd
+            - zbr
+        default: mb
+
+    # shot 관련
+    Shot:
+        type: str
+        shotgun_entity_type: Shot
+        shotgun_field_name: code
+        format_spec: "%03d"
+
+    # step 관련
+    Step:
+        type: str
+        shotgun_entity_type: Step
+        shotgun_field_name: short_name
+        value:
+            - model
+            - rig
+            - layout
+            - anim
+            - light
+            - comp
+
+    # Sequence 관련
+    Sequence:
+        type: str
+        shotgun_entity_type: Sequence
+        shotgun_field_name: code
+        format_spec: "SEQ_%03d"
+
     # Represents the optional output name for frames written by the Shotgun Write Node
     nuke.output:
         alias: output
@@ -180,6 +284,10 @@ keys:
         format_spec: "05"
         alias: SEQ
 
+    # maya project
+    maya_project_path:
+        type: str
+        default:'C:/Users/admin/Documents/maya/projects'
 
 #
 # The paths section contains all the the key locations where files are to be stored
@@ -315,13 +423,14 @@ paths:
         definition: '@shot_root/pub/maya'
     # The location of WIP files
     maya_shot_work:
-        definition: '@shot_root/dev/maya/{name}.v{version}[_{name}].{maya_extension}'
+        definition: '{Project}/{Task}/shots/{Sequence}/{Shot}/{Step}/dev/{DCCtool}/{Ext}/{Shot}.{Step}.v{Version}.{Ext}'
+        root_name: test_unreal
     # The location of backups of WIP files
     maya_shot_snapshot:
         definition: '@shot_root/dev/maya/snapshots/{name}.v{version}[_{name}].{timestamp}.{maya_extension}'
     # The location of published maya files
     maya_shot_publish:
-        definition: '@shot_root/pub/maya/{name}.v{version}[_{name}].{maya_extension}'
+        definition: '{Project}/scenes/publish/maya/{Sequence}/{Shot}/{Step}/{Asset}.{Step}.v{Version}.{maya_extension}'
 
 
     #
@@ -568,13 +677,14 @@ paths:
         definition: '@asset_root/pub/maya'
     # The location of WIP files
     maya_asset_work:
-        definition: '@asset_root/dev/maya/{name}.v{version}[_{name}].{maya_extension}'
+        definition: '{Project}/{Task}/assets/{sg_asset_type}/{Asset}/{Step}/dev/{dcc_tool}/{extension}/{Asset}.{Step}.v{version}.{extension}'
+        root_name: test_unreal
     # The location of backups of WIP files
     maya_asset_snapshot:
         definition: '@asset_root/dev/maya/snapshots/{name}.v{version}[_{name}].{timestamp}.{maya_extension}'
     # The location of published maya files
     maya_asset_publish:
-        definition: '@asset_root/pub/maya/{name}.v{version}[_{name}].{maya_extension}'
+        definition: 'projects/{project}/scenes/publish/maya/{Asset}/{Step}/{Asset}.{Step}.v{version}.{maya_extension}'
 
 
     #
