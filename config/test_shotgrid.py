@@ -34,3 +34,7 @@ try:
 except Exception as e:
     print("Error creating pipeline configuration:", str(e))
 
+storage_list = sg.find("LocalStorage", [], ["code", "id"])
+
+for storage in storage_list:
+    print(f"Storage Name: {storage['code']}, ID: {storage['id']}")
