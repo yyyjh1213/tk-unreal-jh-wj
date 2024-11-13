@@ -284,10 +284,10 @@ keys:
         format_spec: "05"
         alias: SEQ
 
-    # maya project
-    maya_project_path:
-        type: str
-        default:'C:/Users/admin/Documents/maya/projects'
+    # # maya project
+    # maya_project_path:
+    #     type: str
+    #     default:'C:/Users/admin/Documents/maya/projects'
 
 #
 # The paths section contains all the the key locations where files are to be stored
