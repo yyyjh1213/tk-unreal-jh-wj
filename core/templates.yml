@@ -88,7 +88,7 @@ keys:
     #버전 관련
     Version:
         type: int
-        version_format: "v{version:03d}" #v001,v002 형식으로 표현
+        format_spec: "03" #v001,v002 형식으로 표현
         shotgun_entity_type: Version
         shotgun_field_name: version_number
         default: 1
@@ -138,12 +138,19 @@ keys:
             - zbr
         default: mb
 
+    # Sequence 관련
+    Sequence:
+        type: str
+        shotgun_entity_type: Sequence
+        shotgun_field_name: code
+        version_format: "S{Shot:03d}" #S001
+
     # shot 관련
     Shot:
         type: str
         shotgun_entity_type: Shot
         shotgun_field_name: code
-        format_spec: "%03d"
+        version_format: "S{Sequence:03d}_{Shot:04d}" #S001_0010 형식
 
     # step 관련
     Step:
@@ -157,13 +164,6 @@ keys:
             - anim
             - light
             - comp
-
-    # Sequence 관련
-    Sequence:
-        type: str
-        shotgun_entity_type: Sequence
-        shotgun_field_name: code
-        format_spec: "SEQ_%03d"
 
     # Represents the optional output name for frames written by the Shotgun Write Node
     nuke.output:
