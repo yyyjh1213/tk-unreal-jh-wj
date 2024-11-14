@@ -22,7 +22,7 @@ keys:
         shotgun_field_name: sg_sequence
 
     # Previz specific keys
-    previz_step
+    previz_step:
         type: str
         shotgun_entity_type: Step
         shotgun_filed_name: code
