@@ -88,7 +88,7 @@ keys:
     #버전 관련
     Version:
         type: int
-        format_spec: "v%03d" #v001,v002 형식으로 표현
+        version_format: "v{version:03d}" #v001,v002 형식으로 표현
         shotgun_entity_type: Version
         shotgun_field_name: version_number
         default: 1
