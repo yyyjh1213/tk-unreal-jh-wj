@@ -33,13 +33,15 @@ keys:
         type: str
     Step:
         type: str
+        shotgun_entity_type: Step
+        shotgun_field_name: code
     sg_asset_type:
         type: str
     Asset:
         type: str
     name:
         type: str
-        filter_by: "^[A-Za-z0-9_]+$"
+        #filter_by: "^[A-Za-z0-9_]+$"
     iteration:
         type: int
     version:
@@ -64,106 +66,6 @@ keys:
     #2차 폴더 스트럭쳐 구조
     #{project}/{task}/assets/{asset_type}/{asset}/{step}/dev/{DCCtool}/{ext}/{asset}.{step}.v{version}.{ext}
     
-    #프로젝트 관련
-    Project:
-        type: str
-        shotgun_entity_type: Project
-        shotgun_field_name: name
-        #shotgun_filters: - [is_active, "is", True]
-
-    # Task 관련
-    Task:
-        type: str
-        shotgun_entity_type: Task
-        shotgun_field_name: content
-        values:
-            - modeling
-            - rig
-            - texture
-            - concept
-            - layout
-            - previs
-            - ue
-
-    #버전 관련
-    Version:
-        type: int
-        format_spec: "03" #v001,v002 형식으로 표현
-        shotgun_entity_type: Version
-        shotgun_field_name: version_number
-        default: 1
-
-    #Asset_type 관련
-    Sg_asset_type:
-        type: str
-        shotgun_entity_type: Asset
-        shotgun_field_name: sg_asset_type
-        values:
-            - char
-            - prop
-            - env
-            - veh
-    #asset 관련
-    Asset:
-        type: str
-        shotgun_entity_type: Asset
-        shotgun_field_name: code
-        values:
-            - model
-            - rig
-            - texture
-            - concept
-            - layout
-    #DCCtool
-    DCCtool:
-        type: str
-        values:
-            - maya
-            - houdini
-            - nuke
-            - substance
-            - photoshop
-            - zbrush
-        default: maya
-    #ext
-    Ext:
-        type: str
-        choices:
-            - mb
-            - ma
-            - hip
-            - nk
-            - spp
-            - psd
-            - zbr
-        default: mb
-
-    # Sequence 관련
-    Sequence:
-        type: str
-        shotgun_entity_type: Sequence
-        shotgun_field_name: code
-        version_format: "S{Shot:03d}" #S001
-
-    # shot 관련
-    Shot:
-        type: str
-        shotgun_entity_type: Shot
-        shotgun_field_name: code
-        version_format: "S{Sequence:03d}_{Shot:04d}" #S001_0010 형식
-
-    # step 관련
-    Step:
-        type: str
-        shotgun_entity_type: Step
-        shotgun_field_name: short_name
-        value:
-            - model
-            - rig
-            - layout
-            - anim
-            - light
-            - comp
 
     # Represents the optional output name for frames written by the Shotgun Write Node
     nuke.output:
@@ -171,6 +73,9 @@ keys:
         type: str
         filter_by: alphanumeric
 
+    SEQ:
+        type: sequence
+        format_spec: "04"
     # Represents the optional output name for frames written by the After Effects Publish Rendering Plugin
     afx.comp:
         alias: comp
@@ -183,9 +88,6 @@ keys:
             mov: Quicktime Movie (.mov)
             avi: Audio Video Interleaved (.avi)
 
-    SEQ:
-        type: sequence
-        format_spec: "04"
 
     # Represents a frame sequence exported from Flame
     flame.frame:
@@ -284,10 +186,29 @@ keys:
         format_spec: "05"
         alias: SEQ
 
-    # # maya project
-    # maya_project_path:
-    #     type: str
-    #     default:'C:/Users/admin/Documents/maya/projects'
+    # These are used by the Loader in Unreal
+    sg_asset_type_ue4:
+        type: str
+        shotgun_entity_type: Asset
+        shotgun_field_name: sg_asset_type
+    sg_asset_name:
+        type: str
+        shotgun_entity_type: Asset
+        shotgun_field_name: code
+    sg_shot_name:
+        type: str
+        shotgun_entity_type: Shot
+        shotgun_field_name: code
+    sg_sequence_name:
+        type: str
+        shotgun_entity_type: Shot
+        shotgun_field_name: sg_sequence
+
+    # These are used by the Movie Publish in Unreal
+    level_sequence:
+        type: str
+    world:
+        type: str
 
 #
 # The paths section contains all the the key locations where files are to be stored
