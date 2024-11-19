@@ -9,4 +9,4 @@ frameworks:
         version: v1.3.1
         type: dev
         organization: ue4plugins
-        repository: C:\Users\admin\AppData\Roaming\Shotgun\bundle_cache\github\ue4plugins\tk-framework-unrealqt
+        repository: "C:\Users\admin\AppData\Roaming\Shotgun\bundle_cache\github\ue4plugins\tk-framework-unrealqt"
