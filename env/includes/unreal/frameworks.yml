@@ -7,6 +7,6 @@ frameworks:
     tk-framework-unrealqt_v1.x.x:
       location:
         version: v1.3.1
-        type: github_release
+        type: dev
         organization: ue4plugins
-        repository: tk-framework-unrealqt
+        repository: C:\Users\admin\AppData\Roaming\Shotgun\bundle_cache\github\ue4plugins\tk-framework-unrealqt
