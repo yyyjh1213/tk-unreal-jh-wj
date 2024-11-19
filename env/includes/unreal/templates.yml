@@ -25,7 +25,7 @@ keys:
     previz_step:
         type: str
         shotgun_entity_type: Step
-        shotgun_filed_name: code
+        shotgun_field_name: code
         default: "Previz"
         filters:
             - {"path": "short_name","relation": "in", "values": ["previz", "previs"]}
