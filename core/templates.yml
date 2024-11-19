@@ -198,8 +198,10 @@ paths:
     #
     # These don't require the standard formatting (with definition and root_name) because they
     # will be set within each template that uses the alias.
-    shot_root: seq/{Sequence}/{Shot}/{Step}
-    asset_root: assets/{sg_asset_type}/{Asset}/{Step}
+    
+    #기본 primary root: c:/show
+    asset_root: {project}/{task_name}/assets/{sg_asset_type}/{Asset}/{Step}
+    shot_root: {project}/{task_name}/seq/{Sequence}/{Shot}/{Step}
     sequence_root: seq/{Sequence}
 
 
@@ -457,6 +459,7 @@ paths:
         definition: '@shot_root/dev/nuke/precomp/{Shot}_{Step}_v{version}[_{name}]_precomp/{Shot}_{Step}_v{version}[_{name}]_precomp.{SEQ}.exr'
     nuke_write_comp_precomp_dpx:
         definition: '@shot_root/dev/nuke/precomp/{Shot}_{Step}_v{version}[_{name}]_precomp/{Shot}_{Step}_v{version}[_{name}]_precomp.{SEQ}.dpx'
+    
     # review output
     shot_quicktime_quick:
         definition: '@shot_root/review/quickdaily/{Shot}_{name}_{iteration}.mov'
@@ -568,14 +571,18 @@ paths:
         definition: '@asset_root/pub/maya'
     # The location of WIP files
     maya_asset_work:
-        definition: '@asset_root/dev/maya/{name}.v{version}[_{name}].{maya_extension}'
+        definition: '@asset_root/dev/maya/{name}.v{version}.{maya_extension}'
+        # definition: '@asset_root/dev/maya/{name}.v{version}[_{name}].{maya_extension}'
     # The location of backups of WIP files
     maya_asset_snapshot:
         definition: '@asset_root/dev/maya/snapshots/{name}.v{version}[_{name}].{timestamp}.{maya_extension}'
+    # The Location of maya clean files
+    maya_asset_clena_work: 
+        definition: '@asset_root/dev/maya/{name}.clean.{Step}.v{version}.{maya_extention}'
     # The location of published maya files
     maya_asset_publish:
-        definition: '@asset_root/pub/maya/{name}.v{version}[_{name}].{maya_extension}'
-
+        definition: '@asset_root/pub/maya/{name}.v{version}.{maya_extension}'
+        # definition: '@asset_root/pub/maya/{name}.v{version}[_{name}].{maya_extension}'
 
     #
     # Houdini

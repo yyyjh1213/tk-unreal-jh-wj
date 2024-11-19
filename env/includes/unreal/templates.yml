@@ -68,27 +68,30 @@ paths:
     # Hook implementation intended to be a starting point for a pipeline
     # No context info used in template, developers expected to further customize
     unreal.asset_publish:
-        definition: 'assets/unreal/exports/{YYYY}_{MM}_{DD}/{name}.fbx'
+        definition: '@asset_root/pub/unreal/fbx/{YYYY}_{MM}_{DD}/{name}.v{version}.fbx'
         root_name: primary
+    #Location of dev fbx files
+    unreal.asset_work:
+        definition: '@asset_root/dev/unreal/fbx/{YYYY}_{MM}_{DD}/{name}.v{version}.fbx'
 
-    #
-    # Previz to Unreal Integration
-    #
+    # #
+    # # Previz to Unreal Integration
+    # #
 
-    # Previz asset export for Unreal
-    unreal.previz_asset_export:
-        definition: 'assets/previz/exports/{ue_sg_asset_type}/{ue_sg_asset_name}/v{version}/{name}.fbx'
-        root_name: test_unreal  # 프리비즈 스토리지
+    # # Previz asset export for Unreal
+    # unreal.previz_asset_export:
+    #     definition: 'assets/previz/exports/{ue_sg_asset_type}/{ue_sg_asset_name}/v{version}/{name}.fbx'
+    #     root_name: test_unreal  # 프리비즈 스토리지
 
-    # Previz shot export for Unreal
-    unreal.previz_shot_export:
-        definition: 'sequences/{Sequence}/{Shot}/previz/exports/{YYYY}_{MM}_{DD}/{name}.fbx'
-        root_name: test_unreal
+    # # Previz shot export for Unreal
+    # unreal.previz_shot_export:
+    #     definition: 'sequences/{Sequence}/{Shot}/previz/exports/{YYYY}_{MM}_{DD}/{name}.fbx'
+    #     root_name: test_unreal
 
-    # Previz review output from Unreal
-    unreal.previz_review:
-        definition: 'sequences/{Sequence}/{Shot}/previz/review/{YYYY}_{MM}_{DD}/{name}.{ue_mov_ext}'
-        root_name: test_unreal
+    # # Previz review output from Unreal
+    # unreal.previz_review:
+    #     definition: 'sequences/{Sequence}/{Shot}/previz/review/{YYYY}_{MM}_{DD}/{name}.{ue_mov_ext}'
+    #     root_name: test_unreal
 strings:
    # entity-specific templates for importing files into the Unreal content browser
     # template logic is defined in Python, not settings:
