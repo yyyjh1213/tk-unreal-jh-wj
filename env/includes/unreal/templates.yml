@@ -27,8 +27,6 @@ keys:
         shotgun_entity_type: Step
         shotgun_field_name: code
         default: "Previz"
-        filters:
-            - {"path": "short_name","relation": "in", "values": ["previz", "previs"]}
     # These are used by the Movie Publish in Unreal
     ue_level_sequence:
         type: str
