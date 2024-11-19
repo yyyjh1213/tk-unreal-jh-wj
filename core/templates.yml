@@ -580,7 +580,7 @@ paths:
         definition: '@asset_root/dev/maya/snapshots/{name}.v{version}[_{name}].{timestamp}.{maya_extension}'
     # The Location of maya clean files
     maya_asset_clena_work: 
-        definition: '@asset_root/dev/maya/{name}.clean.{Step}.v{version}.{maya_extention}'
+        definition: '@asset_root/dev/maya/{name}.clean.{Step}.v{version}.{maya_extension}'
     # The location of published maya files
     maya_asset_publish:
         definition: '@asset_root/pub/maya/{name}.v{version}.{maya_extension}'
