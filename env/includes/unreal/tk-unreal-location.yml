@@ -9,3 +9,8 @@ tk-unreal.location:
   type: github_release
   organization: ue4plugins
   repository: tk-unreal
+
+#SG 스토리지 정의
+location: C:/show/test_unreal
+type: dev
+name: test_unreal
