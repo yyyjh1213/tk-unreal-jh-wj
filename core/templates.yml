@@ -111,7 +111,7 @@ keys:
     project:
         type: str
         shotgun_entity_type: Project
-        shotgun_filed_name: code
+        shotgun_field_name: code
 
     # These are used for the Mari UDIM pipeline:
     UDIM:
