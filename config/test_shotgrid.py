@@ -38,3 +38,19 @@ storage_list = sg.find("LocalStorage", [], ["code", "id"])
 
 for storage in storage_list:
     print(f"Storage Name: {storage['code']}, ID: {storage['id']}")
+
+# Project entity type 스키마 확인
+project_schema = sg.schema_field_read('Project')
+print("\nProject 엔티티 스키마:")
+for field_name, field_info in project_schema.items():
+    print(f"필드명: {field_name}")
+    print(f"필드 정보: {field_info}")
+    print("---")
+
+# 특정 프로젝트의 모든 필드 데이터 확인
+project_fields = sg.find_one('Project', 
+                           [['id', 'is', 122]], # 프로젝트 ID 122 기준
+                           list(project_schema.keys()))
+print("\n프로젝트 상세 정보:")
+for field, value in project_fields.items():
+    print(f"{field}: {value}")
