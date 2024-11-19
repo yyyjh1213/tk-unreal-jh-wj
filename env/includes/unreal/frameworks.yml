@@ -5,8 +5,8 @@
  # unrealqt - PySide build for Unreal
 frameworks:
     tk-framework-unrealqt_v1.x.x:
-      location:
-        type: app_store
-        name: tk-framework-unrealqt
-        version: v1.3.1
+        location:
+            type: dev
+            path: C:/Users/admin/AppData/Roaming/Shotgun/bundle_cache/github/ue4plugins/tk-framework-unrealqt
+            version: v1.3.1
         # organization: ue4plugins
