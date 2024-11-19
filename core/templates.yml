@@ -202,8 +202,8 @@ paths:
     # will be set within each template that uses the alias.
     
     #기본 primary root: c:/show
-    asset_root: {project}/{task_name}/assets/{sg_asset_type}/{Asset}/{Step}
-    shot_root: {project}/{task_name}/seq/{Sequence}/{Shot}/{Step}
+    asset_root: /{project}/{task_name}/assets/{sg_asset_type}/{Asset}/{Step}
+    shot_root: /{project}/{task_name}/seq/{Sequence}/{Shot}/{Step}
     sequence_root: seq/{Sequence}
 
 
