@@ -32,3 +32,28 @@ settings.tk-unreal.project:
   - {app_instance: tk-multi-shotgunpanel, name: ''}
   launch_builtin_plugins: [basic]
   automatic_context_switch: false
+
+# asset_step - Maya FBX 파일 임포트를 위한 새로운 설정 추가
+settings.tk-unreal.asset_step:
+  app:
+    tk-multi-about:
+      location: "@app.tk-multi-about.location"
+    tk-multi-loader2: "@settings.tk-multi-loader2.unreal"
+    tk-multi-publish2: "@settings.tk-multi-publish2.unreal.asset_step"
+    tk-multi-pythonconsole:
+      location: "@apps.tk-multi-pythonconsole.location"
+    tk-multi-shotgunpanel: "@settings.tk-multi-shotgunpanel.unreal"
+    tk-multi-workfiles2: "@settings.tk-multi-workfiles2.unreal.asset_step"
+  location: "@tk-unreal.location"
+ 
+   # 자주사용하는 기능
+  menu_favorites:
+  - {app_instance: tk-multi-workfiles2, name: File Open...}
+  - {app_instance: tk-multi-loader2, name: Load FBX...}
+  - {app_instance: tk-multi-publish2, name: Publish...}
+
+  run_at_startup:
+  - {app_instance: tk-multi-shotgunpanel, name: ''}
+  launch_builtin_plugins: [basic]
+  automatic_context_switch: false
+  template_project: asset_work_area_unreal
