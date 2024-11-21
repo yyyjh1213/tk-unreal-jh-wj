@@ -26,7 +26,7 @@ settings.tk-unreal.project:
       location: "@apps.tk-multi-pythonconsole.location"
     tk-multi-shotgunpanel: "@settings.tk-multi-shotgunpanel.unreal"
   location: "@tk-unreal.location"
-  menu_favourites: []
+  menu_favorites: []
   run_at_startup:
     - {app_instance: tk-multi-shotgunpanel, name: ''}
   launch_builtin_plugins: [basic]
