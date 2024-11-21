@@ -7,8 +7,8 @@
 publish_help_url: &help_url "https://support.shotgunsoftware.com/hc/en-us/articles/115000068574-Integrations-User-Guide#The%20Publisher"
 
 includes:
-- ../../app_locations.yml
-- ../settings/tk-multi-publish2.yml
+- ../../app_locations.yml # env/includes/app_locations.yml로 가기 위해
+- ../../settings/tk-multi-publish2.yml # env/includes/settings/tk-multi-publish2.yml로 가기 위해
 
 settings.tk-multi-publish2.unreal.project:
   collector: "{self}/collector.py:{engine}/tk-multi-publish2/basic/collector.py"
