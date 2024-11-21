@@ -11,7 +11,7 @@ settings.tk-multi-loader2.unreal:
     Motion Builder FBX: [import_content, import_level]
     Maya FBX: [import_content]
     Unreal FBX: [import_content]
-  actions_hook: '{config}/tk-multi-loader2/tk-unreal_actions.py' #우리의 python파일로 작업진행.
+  actions_hook: '{engine}/tk-multi-loader2/tk-unreal_actions.py' #우리의 python파일로 작업진행.
   entities:
   - caption: Assets
     entity_type: Asset
