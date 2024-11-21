@@ -9,7 +9,7 @@ includes:
 - ../../app_locations.yml
 - ../tk-unreal-location.yml
 - ./tk-multi-loader2.yml
-- ./tk-multi-publish2.yml
+- unreal/settings/tk-multi-publish2.yml
 - ../../settings/tk-multi-screeningroom.yml
 - ./tk-multi-shotgunpanel.yml
 
