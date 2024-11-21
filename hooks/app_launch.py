@@ -108,6 +108,7 @@ class AppLaunch(tank.Hook):
             self.parent.log_debug("sys.path: %s" % sys.path)
 
         if depart_confirm:
+            
             adapter = get_adapter(platform.system())
             packages = get_rez_packages(sg, app_name, version, system, project)
 
