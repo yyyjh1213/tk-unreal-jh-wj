@@ -77,8 +77,12 @@ class AppLaunch(tank.Hook):
             packages = os.path.join(now_dir, 'packages', 'win')
 
             sys.path.append(packages)
+            external_paths = [
+                "external_path3",
+                packages
+            ]
             
-            new_paths = os.pathsep.join(packages)
+            new_paths = os.pathsep.join(external_paths)
             
             if 'PYTHONPATH' in os.environ:
                 os.environ['PYTHONPATH'] += os.pathsep + new_paths
