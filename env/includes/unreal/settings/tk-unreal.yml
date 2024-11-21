@@ -6,11 +6,11 @@
 
 includes:
 - ../frameworks.yml
-- ../../app_locations.yml
+- ../app_locations.yml
 - ../tk-unreal-location.yml
 - ./tk-multi-loader2.yml
 - ./tk-multi-publish2.yml
-- ./tk-multi-screeningroom.yml
+- ../../tk-multi-screeningroom.yml
 - ./tk-multi-shotgunpanel.yml
 
 ################################################################################
