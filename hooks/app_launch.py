@@ -86,10 +86,10 @@ class AppLaunch(tank.Hook):
             
             new_paths = os.pathsep.join(external_paths)
             
-            if 'PYTHONPATH' in os.environ:
-                os.environ['PYTHONPATH'] += os.pathsep + new_paths
-            else:
-                os.environ['PYTHONPATH'] = new_paths
+            # if 'PYTHONPATH' in os.environ:
+            #     os.environ['PYTHONPATH'] += os.pathsep + new_paths
+            # else:
+            #     os.environ['PYTHONPATH'] = new_paths
                 
             
             if 'UE_PYTHONPATH' in os.environ:
@@ -104,7 +104,7 @@ class AppLaunch(tank.Hook):
 
             self.parent.log_debug("UNREAL ENGINE will be launched at WINDOWS OS")
             self.parent.log_debug("WONJIN_APP_LAUNCH Updated Python paths:")
-            self.parent.log_debug("PYTHONPATH: %s" % os.environ['PYTHONPATH'])
+            # self.parent.log_debug("PYTHONPATH: %s" % os.environ['PYTHONPATH'])
             self.parent.log_debug("UE_PYTHONPATH: %s" % os.environ['UE_PYTHONPATH'])
             self.parent.log_debug("WONJIN_APP_LAUNCH: %s" % os.environ['WONJIN_APP_LAUNCH'])
             self.parent.log_debug("sys.path: %s" % sys.path)
