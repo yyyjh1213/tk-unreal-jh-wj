@@ -68,9 +68,11 @@ class AppLaunch(tank.Hook):
 
         depart_confirm = False
 
-        if (depart['name'] == 'RND' and engine_name == 'tk-nuke') or depart['name'] in ['General']:
-            depart_confirm = True
-
+        if depart is not None:
+            if (depart['name'] == 'RND' and engine_name == 'tk-nuke') or depart['name'] in ['General']:
+                depart_confirm = True
+        else:
+            self.parent.log_debug("No department found for user: %s" % user)
 
         if sys.version_info.major == 3 and app_name == 'unreal' and system == 'Windows':
             now_dir = os.path.dirname(os.path.abspath(__file__))
