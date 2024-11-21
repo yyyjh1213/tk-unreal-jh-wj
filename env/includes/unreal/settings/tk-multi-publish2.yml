@@ -8,6 +8,7 @@ publish_help_url: &help_url "https://support.shotgunsoftware.com/hc/en-us/articl
 
 includes:
 - ../../app_locations.yml
+- ../settings/tk-multi-publish2.yml
 
 settings.tk-multi-publish2.unreal.project:
   collector: "{self}/collector.py:{engine}/tk-multi-publish2/basic/collector.py"
