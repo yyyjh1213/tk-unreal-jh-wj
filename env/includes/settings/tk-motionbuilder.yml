@@ -8,7 +8,6 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 #
-
 ################################################################################
 
 includes:
@@ -33,7 +32,7 @@ settings.tk-motionbuilder.asset:
     tk-multi-workfiles2:
       location: '@apps.tk-multi-workfiles2.location'
   location: '@engines.tk-motionbuilder.location'
-  menu_favourites:
+  menu_favorites:
   - {app_instance: tk-multi-workfiles2, name: File Open...}
 
 # asset_step
@@ -49,7 +48,7 @@ settings.tk-motionbuilder.asset_step:
     tk-multi-shotgunpanel:
       location: "@apps.tk-multi-shotgunpanel.location"
   location: '@engines.tk-motionbuilder.location'
-  menu_favourites:
+  menu_favorites:
   - {app_instance: tk-multi-workfiles2, name: File Open...}
   - {app_instance: tk-multi-snapshot, name: Snapshot...}
   - {app_instance: tk-multi-workfiles2, name: File Save...}
@@ -66,7 +65,7 @@ settings.tk-motionbuilder.project:
     tk-multi-workfiles2:
       location: '@apps.tk-multi-workfiles2.location'
   location: '@engines.tk-motionbuilder.location'
-  menu_favourites:
+  menu_favorites:
   - {app_instance: tk-multi-workfiles2, name: File Open...}
   template_project:
 
@@ -81,7 +80,7 @@ settings.tk-motionbuilder.sequence:
     tk-multi-workfiles2:
       location: '@apps.tk-multi-workfiles2.location'
   location: '@engines.tk-motionbuilder.location'
-  menu_favourites:
+  menu_favorites:
   - {app_instance: tk-multi-workfiles2, name: File Open...}
 
 # shot
@@ -95,7 +94,7 @@ settings.tk-motionbuilder.shot:
     tk-multi-workfiles2:
       location: '@apps.tk-multi-workfiles2.location'
   location: '@engines.tk-motionbuilder.location'
-  menu_favourites:
+  menu_favorites:
   - {app_instance: tk-multi-workfiles2, name: File Open...}
 
 # shot_step
@@ -113,7 +112,7 @@ settings.tk-motionbuilder.shot_step:
     tk-multi-shotgunpanel:
       location: "@apps.tk-multi-shotgunpanel.location"
   location: '@engines.tk-motionbuilder.location'
-  menu_favourites:
+  menu_favorites:
   - {app_instance: tk-multi-workfiles2, name: File Open...}
   - {app_instance: tk-multi-snapshot, name: Snapshot...}
   - {app_instance: tk-multi-workfiles2, name: File Save...}

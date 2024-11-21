@@ -8,7 +8,6 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 #
-
 ################################################################################
 
 includes:
@@ -70,7 +69,7 @@ settings.tk-nuke.hiero.project:
     keep_in_menu: false
     name: "Open in Flow Production Tracking"
     requires_selection: true
-  menu_favourites:
+  menu_favorites:
   - app_instance: tk-multi-workfiles2
     name: "File Open..."
   location: "@engines.tk-nuke.location"
@@ -88,7 +87,7 @@ settings.tk-nuke.asset:
     tk-multi-workfiles2: "@settings.tk-multi-workfiles2"
     tk-nuke-quickreview:
       location: "@apps.tk-nuke-quickreview.location"
-  menu_favourites:
+  menu_favorites:
   - {app_instance: tk-multi-workfiles2, name: File Open...}
   location: "@engines.tk-nuke.location"
 
@@ -111,7 +110,7 @@ settings.tk-nuke.asset_step:
     tk-nuke-quickreview:
       location: "@apps.tk-nuke-quickreview.location"
     tk-nuke-writenode: "@settings.tk-nuke-writenode.asset"
-  menu_favourites:
+  menu_favorites:
   - {app_instance: tk-multi-workfiles2, name: File Open...}
   - {app_instance: tk-multi-snapshot, name: Snapshot...}
   - {app_instance: tk-multi-workfiles2, name: File Save...}
@@ -129,7 +128,7 @@ settings.tk-nuke.project:
     tk-multi-workfiles2: "@settings.tk-multi-workfiles2"
     tk-nuke-quickreview:
       location: "@apps.tk-nuke-quickreview.location"
-  menu_favourites:
+  menu_favorites:
   - {app_instance: tk-multi-workfiles2, name: File Open...}
   location: "@engines.tk-nuke.location"
 
@@ -143,7 +142,7 @@ settings.tk-nuke.sequence:
     tk-multi-workfiles2: "@settings.tk-multi-workfiles2"
     tk-nuke-quickreview:
       location: "@apps.tk-nuke-quickreview.location"
-  menu_favourites:
+  menu_favorites:
   - {app_instance: tk-multi-workfiles2, name: File Open...}
   location: "@engines.tk-nuke.location"
 
@@ -157,7 +156,7 @@ settings.tk-nuke.shot:
     tk-multi-workfiles2: "@settings.tk-multi-workfiles2.launch_at_startup"
     tk-nuke-quickreview:
       location: "@apps.tk-nuke-quickreview.location"
-  menu_favourites:
+  menu_favorites:
   - {app_instance: tk-multi-workfiles2, name: File Open...}
   location: "@engines.tk-nuke.location"
 
@@ -182,7 +181,7 @@ settings.tk-nuke.shot_step:
     tk-nuke-quickreview:
       location: "@apps.tk-nuke-quickreview.location"
     tk-nuke-writenode: "@settings.tk-nuke-writenode.shot"
-  menu_favourites:
+  menu_favorites:
   - {app_instance: tk-multi-workfiles2, name: File Open...}
   - {app_instance: tk-multi-snapshot, name: Snapshot...}
   - {app_instance: tk-multi-workfiles2, name: File Save...}
@@ -228,7 +227,7 @@ settings.tk-nuke.nukestudio.asset_step:
     keep_in_menu: false
     name: "Publish..."
     requires_selection: true
-  menu_favourites:
+  menu_favorites:
   - app_instance: tk-multi-workfiles2
     name: "File Open..."
   location: '@engines.tk-nuke.location'
@@ -276,7 +275,7 @@ settings.tk-nuke.nukestudio.project:
     keep_in_menu: false
     name: "Open in Flow Production Tracking"
     requires_selection: true
-  menu_favourites:
+  menu_favorites:
   - app_instance: tk-multi-workfiles2
     name: File Open...
   location: '@engines.tk-nuke.location'
@@ -316,7 +315,7 @@ settings.tk-nuke.nukestudio.shot_step:
     keep_in_menu: false
     name: "Publish..."
     requires_selection: true
-  menu_favourites:
+  menu_favorites:
   - app_instance: tk-multi-workfiles2
     name: "File Open..."
   location: '@engines.tk-nuke.location'

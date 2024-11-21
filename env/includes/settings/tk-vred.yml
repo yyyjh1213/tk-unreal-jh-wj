@@ -8,7 +8,6 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 #
-
 ################################################################################
 
 includes:
@@ -33,7 +32,7 @@ settings.tk-vred.asset:
       location: "@apps.tk-multi-pythonconsole.location"
     tk-multi-shotgunpanel: "@settings.tk-multi-shotgunpanel.vred"
     tk-multi-workfiles2: "@settings.tk-multi-workfiles2.vred"
-  menu_favourites:
+  menu_favorites:
   - {app_instance: tk-multi-workfiles2, name: File Open...}
   location: "@engines.tk-vred.location"
 
@@ -53,7 +52,7 @@ settings.tk-vred.asset_step:
     tk-multi-scenebuilder: "@settings.tk-multi-scenebuilder.vred"
     tk-multi-bg-publish:
       location: "@apps.tk-multi-bg-publish.location"
-  menu_favourites:
+  menu_favorites:
   - {app_instance: tk-multi-workfiles2, name: File Open...}
   - {app_instance: tk-multi-workfiles2, name: File Save...}
   - {app_instance: tk-multi-publish2, name: Publish...}
@@ -87,7 +86,7 @@ settings.tk-vred.project:
     tk-multi-shotgunpanel: "@settings.tk-multi-shotgunpanel.vred"
     tk-multi-workfiles2: "@settings.tk-multi-workfiles2.vred"
     tk-multi-data-validation: "@settings.tk-multi-data-validation.vred"
-  menu_favourites:
+  menu_favorites:
   - {app_instance: tk-multi-workfiles2, name: File Open...}
   run_at_startup:
   - { app_instance: tk-multi-shotgunpanel, name: '' }
