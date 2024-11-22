@@ -203,13 +203,9 @@ paths:
     
 
     # 기존 path 설정
-    # shot_root: seq/{Sequence}/{Shot}/{Step}
-    # asset_root: assets/{sg_asset_type}/{Asset}/{Step}
-    # sequence_root: seq/{Sequence}
-    # 수정한 path 설정
-    shot_root: {project}/{task_name}/seq/{Sequence}/{Shot}/{Step}
-    asset_root: {project}/{task_name}/assets/{sg_asset_type}/{Asset}/{Step}
-    sequence_root: {project}/{task_name}/seq/{Sequence}
+    shot_root: seq/{Sequence}/{Shot}/{Step}
+    asset_root: assets/{sg_asset_type}/{Asset}/{Step}
+    sequence_root: seq/{Sequence}
 
 
     ##########################################################################################
@@ -315,7 +311,8 @@ paths:
     #
     # Maya
     #
-
+    # shot_root: seq/{Sequence}/{Shot}/{Step}
+    
     # define the location of a work area
     shot_work_area_maya:
         definition: '@shot_root/dev/maya'
