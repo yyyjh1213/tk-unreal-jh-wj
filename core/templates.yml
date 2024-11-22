@@ -446,8 +446,7 @@ paths:
         definition: '@shot_root/dev/images/v{version}/{Shot}_{nuke.output}_v{version}[_{name}].{SEQ}.mov'
     nuke_shot_render_pub_mov:
         definition: '@shot_root/pub/images/v{version}/{Shot}_{nuke.output}_v{version}[_{name}].{SEQ}.mov'
-   
-    #WESTWORLD START
+    # WESTWORLD START
     nuke_write_node_exr:
         definition: '@shot_root/dev/nuke/write/{Shot}_{task_name}_v{version}[_{name}]/{Shot}_{task_name}_v{version}[_{name}].{SEQ}.exr'
     nuke_write_node_dpx:
@@ -509,7 +508,6 @@ paths:
     asset_alembic_cache:
         definition: '@asset_root/publish/caches/{name}.v{version}[_{name}].abc'
 
-
     #
     # Photoshop
     #
@@ -532,6 +530,7 @@ paths:
         definition: '@asset_root/pub/photoshop/{name}.v{version}.png'
     photoshop_asset_jpg_publish:
         definition: '@asset_root/pub/photoshop/{name}.v{version}.jpg'
+
     #
     # after effects
     #
@@ -557,7 +556,6 @@ paths:
     aftereffects_asset_render_movie:
         definition: '@asset_root/review/{Asset}_{name}_{afx.comp}_v{version}.{afx.mov.ext}'
 
-
     #
     # Mari
     #
@@ -576,7 +574,7 @@ paths:
         definition: '@asset_root/pub/maya'
     # The location of WIP files
     maya_asset_work:
-        definition: '@asset_root/dev/maya/{name}.v{version}.{maya_extension}'
+        definition: '@asset_root/dev/maya/{name}.{step}.v{version}.{maya_extension}'
         # definition: '@asset_root/dev/maya/{name}.v{version}[_{name}].{maya_extension}'
     # The location of backups of WIP files
     maya_asset_snapshot:
@@ -586,7 +584,7 @@ paths:
         definition: '@asset_root/dev/maya/{name}.clean.{Step}.v{version}.{maya_extension}'
     # The location of published maya files
     maya_asset_publish:
-        definition: '@asset_root/pub/maya/{name}.v{version}.{maya_extension}'
+        definition: '@asset_root/pub/maya/{name}.{step}.v{version}.{maya_extension}'
         # definition: '@asset_root/pub/maya/{name}.v{version}[_{name}].{maya_extension}'
 
     #
