@@ -201,10 +201,15 @@ paths:
     # These don't require the standard formatting (with definition and root_name) because they
     # will be set within each template that uses the alias.
     
-    #기본 primary root: c:/show
-    asset_root: /{project}/{task_name}/assets/{sg_asset_type}/{Asset}/{Step}
+
+    # 기존 path 설정
+    # shot_root: seq/{Sequence}/{Shot}/{Step}
+    # asset_root: assets/{sg_asset_type}/{Asset}/{Step}
+    # sequence_root: seq/{Sequence}
+    # 수정한 path 설정
     shot_root: /{project}/{task_name}/seq/{Sequence}/{Shot}/{Step}
-    sequence_root: seq/{Sequence}
+    asset_root: /{project}/{task_name}/assets/{sg_asset_type}/{Asset}/{Step}
+    sequence_root: /{project}/{task_name}/seq/{Sequence} #쓰임이 없음
 
 
     ##########################################################################################
@@ -444,6 +449,7 @@ paths:
         definition: '@shot_root/dev/images/v{version}/{Shot}_{nuke.output}_v{version}[_{name}].{SEQ}.mov'
     nuke_shot_render_pub_mov:
         definition: '@shot_root/pub/images/v{version}/{Shot}_{nuke.output}_v{version}[_{name}].{SEQ}.mov'
+   
     #WESTWORLD START
     nuke_write_node_exr:
         definition: '@shot_root/dev/nuke/write/{Shot}_{task_name}_v{version}[_{name}]/{Shot}_{task_name}_v{version}[_{name}].{SEQ}.exr'
