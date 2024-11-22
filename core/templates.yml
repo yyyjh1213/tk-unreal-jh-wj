@@ -207,9 +207,9 @@ paths:
     # asset_root: assets/{sg_asset_type}/{Asset}/{Step}
     # sequence_root: seq/{Sequence}
     # 수정한 path 설정
-    shot_root: /{project}/{task_name}/seq/{Sequence}/{Shot}/{Step}
-    asset_root: /{project}/{task_name}/assets/{sg_asset_type}/{Asset}/{Step}
-    sequence_root: /{project}/{task_name}/seq/{Sequence} #쓰임이 없음
+    shot_root: {project}/{task_name}/seq/{Sequence}/{Shot}/{Step}
+    asset_root: {project}/{task_name}/assets/{sg_asset_type}/{Asset}/{Step}
+    sequence_root: {project}/{task_name}/seq/{Sequence}
 
 
     ##########################################################################################
