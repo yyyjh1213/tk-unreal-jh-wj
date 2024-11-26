@@ -185,39 +185,44 @@ keys:
     # File Extension
     extension:
         type: str
-        values:
+        description: File extension for various DCC tools
+        choices:
             # Maya extensions
-            maya:
-                type: enum
-                values: ['ma','mb','usd','usda','usdc']
-                default: 'mb'
+            ma: "Maya ASCII (.ma)"
+            mb: "Maya Binary (.mb)"
+            usd: "Universal Scene Description (.usd)"
+            usda: "USD ASCII (.usda)"
+            usdc: "USD Crate (.usdc)"
             # Blender extensions
-            blend:
-                type: enum
-                values: ['blend','fbx','obj','abc','usd','usda','usdc']
-                default: 'blend'
+            blend: "Blender File (.blend)"
+            fbx: "FBX (.fbx)"
+            obj: "Wavefront OBJ (.obj)"
+            abc: "Alembic (.abc)"
             # Houdini extensions
-            houdini:
-                type: enum
-                values: ['hip','hiplc','hipnc','abc','fbx','usd','bgeo','vdb']
-                default: 'hip'
-            #
+            hip: "Houdini Scene (.hip)"
+            hiplc: "Houdini Limited Commercial (.hiplc)"
+            hipnc: "Houdini Non-Commercial (.hipnc)"
+            bgeo: "Houdini Geometry (.bgeo)"
+            vdb: "OpenVDB (.vdb)"
             # MotionBuilder extensions
-            mobu:
-                type: enum
-                values: ['fbx','bvh','abc']
-                default: 'fbx'
+            bvh: "BioVision Hierarchy (.bvh)"
             # Nuke extensions
-            nuke:
-                type: enum
-                values: ['nk','nknc','nkind','exr','dpx','mov']
-                default: 'nk'
+            nk: "Nuke Script (.nk)"
+            nknc: "Nuke Non-Commercial (.nknc)"
+            nkind: "Nuke Indie (.nkind)"
+            exr: "OpenEXR (.exr)"
+            dpx: "DPX (.dpx)"
+            mov: "QuickTime Movie (.mov)"
             # Unreal extensions
-            unreal:
-                type: enum
-                values: ['uasset','umap','fbx','usd','abc','udatasmith','tga','png','jpg']
-                default: 'uasset'
-            #
+            uasset: "Unreal Asset (.uasset)"
+            umap: "Unreal Level (.umap)"
+            udatasmith: "Datasmith (.udatasmith)"
+            tga: "Targa Image (.tga)"
+            png: "PNG Image (.png)"
+            jpg: "JPEG Image (.jpg)"
+        default: "mb"
+        alias: extension
+    #
 # The paths section contains all the the key locations where files are to be stored
 # by Sgtk Apps. Each path is made up of several keys (like {version} or {shot}) and
 # these are defined in the keys section above.
@@ -609,18 +614,16 @@ paths:
         definition: '@asset_root/pub/maya'
     # The location of WIP files
     maya_asset_work:
-        definition: '@asset_root/dev/maya/{extension.maya}/{name}.{Step}.v{version}.{maya_extension}'
-        # definition: '@asset_root/dev/maya/{name}.v{version}[_{name}].{maya_extension}'
+        definition: '@asset_root/dev/maya/{Step}/{name}.{Step}.v{version}.{extension}'
     # The location of backups of WIP files
     maya_asset_snapshot:
         definition: '@asset_root/dev/maya/snapshots/{name}.v{version}[_{name}].{timestamp}.{maya_extension}'
     # The Location of maya clean files
     maya_asset_clean_work: 
-        definition: '@asset_root/dev/maya/{extension.maya}/{name}.clean.{Step}.v{version}.{maya_extension}'
+        definition: '@asset_root/dev/maya/{Step}/{name}.clean.{Step}.v{version}.{extension}'
     # The location of published maya files
     maya_asset_publish:
-        definition: '@asset_root/pub/maya/{extension.maya}/{name}.{Step}.v{version}.{maya_extension}'
-        # definition: '@asset_root/pub/maya/{name}.v{version}[_{name}].{maya_extension}'
+        definition: '@asset_root/pub/maya/{Step}/{name}.{Step}.v{version}.{extension}'
 
     #
     # Houdini
