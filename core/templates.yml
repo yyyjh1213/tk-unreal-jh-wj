@@ -359,13 +359,13 @@ paths:
         definition: '@shot_root/pub/maya'
     # The location of WIP files
     maya_shot_work:
-        definition: '@shot_root/dev/maya/{extension.maya}/{name}.v{version}[_{name}].{maya_extension}'
+        definition: '@shot_root/dev/maya/{extension.maya}/{name}.v{version}[_{name}].{extension}'
     # The location of backups of WIP files
     maya_shot_snapshot:
-        definition: '@shot_root/dev/maya/snapshots/{name}.v{version}[_{name}].{timestamp}.{maya_extension}'
+        definition: '@shot_root/dev/maya/snapshots/{name}.v{version}[_{name}].{timestamp}.{extension}'
     # The location of published maya files
     maya_shot_publish:
-        definition: '@shot_root/pub/maya/{extension.maya}/{name}.v{version}[_{name}].{maya_extension}'
+        definition: '@shot_root/pub/maya/{extension.maya}/{name}.v{version}[_{name}].{extension}'
 
 
     #
