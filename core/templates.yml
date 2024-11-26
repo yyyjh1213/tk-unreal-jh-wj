@@ -185,7 +185,6 @@ keys:
     # File Extension
     extension:
         type: str
-        description: File extension for various DCC tools
         choices:
             # Maya extensions
             ma: "Maya ASCII (.ma)"
