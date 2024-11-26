@@ -189,13 +189,19 @@ keys:
             # Maya extensions
             maya:
                 type: enum
-                values: ['ma','mb']
+                values: ['ma','mb','usd','usda','usdc']
                 default: 'mb'
             # Blender extensions
             blend:
                 type: enum
-                values: ['blend','fbx','obj','abc']
+                values: ['blend','fbx','obj','abc','usd','usda','usdc']
                 default: 'blend'
+            # Houdini extensions
+            houdini:
+                type: enum
+                values: ['hip','hiplc','hipnc','abc','fbx','usd','bgeo','vdb']
+                default: 'hip'
+            #
             # MotionBuilder extensions
             mobu:
                 type: enum
@@ -209,7 +215,7 @@ keys:
             # Unreal extensions
             unreal:
                 type: enum
-                values: ['uasset','umap','fbx','usd','abc','udatasmith']
+                values: ['uasset','umap','fbx','usd','abc','udatasmith','tga','png','jpg']
                 default: 'uasset'
             #
 # The paths section contains all the the key locations where files are to be stored
