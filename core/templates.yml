@@ -182,8 +182,36 @@ keys:
         format_spec: "05"
         alias: SEQ
 
-
-#
+    # File Extension
+    extension:
+        type: str
+        values:
+            # Maya extensions
+            maya:
+                type: enum
+                values: ['ma','mb']
+                default: 'mb'
+            # Blender extensions
+            blend:
+                type: enum
+                values: ['blend','fbx','obj','abc']
+                default: 'blend'
+            # MotionBuilder extensions
+            mobu:
+                type: enum
+                values: ['fbx','bvh','abc']
+                default: 'fbx'
+            # Nuke extensions
+            nuke:
+                type: enum
+                values: ['nk','nknc','nkind','exr','dpx','mov']
+                default: 'nk'
+            # Unreal extensions
+            unreal:
+                type: enum
+                values: ['uasset','umap','fbx','usd','abc','udatasmith']
+                default: 'uasset'
+            #
 # The paths section contains all the the key locations where files are to be stored
 # by Sgtk Apps. Each path is made up of several keys (like {version} or {shot}) and
 # these are defined in the keys section above.
@@ -321,13 +349,13 @@ paths:
         definition: '@shot_root/pub/maya'
     # The location of WIP files
     maya_shot_work:
-        definition: '@shot_root/dev/maya/{name}.v{version}[_{name}].{maya_extension}'
+        definition: '@shot_root/dev/maya/{extension.maya}/{name}.v{version}[_{name}].{maya_extension}'
     # The location of backups of WIP files
     maya_shot_snapshot:
         definition: '@shot_root/dev/maya/snapshots/{name}.v{version}[_{name}].{timestamp}.{maya_extension}'
     # The location of published maya files
     maya_shot_publish:
-        definition: '@shot_root/pub/maya/{name}.v{version}[_{name}].{maya_extension}'
+        definition: '@shot_root/pub/maya/{extension.maya}/{name}.v{version}[_{name}].{maya_extension}'
 
 
     #
@@ -446,7 +474,8 @@ paths:
         definition: '@shot_root/dev/images/v{version}/{Shot}_{nuke.output}_v{version}[_{name}].{SEQ}.mov'
     nuke_shot_render_pub_mov:
         definition: '@shot_root/pub/images/v{version}/{Shot}_{nuke.output}_v{version}[_{name}].{SEQ}.mov'
-    # WESTWORLD START
+   
+        # WESTWORLD START
     nuke_write_node_exr:
         definition: '@shot_root/dev/nuke/write/{Shot}_{task_name}_v{version}[_{name}]/{Shot}_{task_name}_v{version}[_{name}].{SEQ}.exr'
     nuke_write_node_dpx:
@@ -574,17 +603,17 @@ paths:
         definition: '@asset_root/pub/maya'
     # The location of WIP files
     maya_asset_work:
-        definition: '@asset_root/dev/maya/{name}.{Step}.v{version}.{maya_extension}'
+        definition: '@asset_root/dev/maya/{extension.maya}/{name}.{Step}.v{version}.{maya_extension}'
         # definition: '@asset_root/dev/maya/{name}.v{version}[_{name}].{maya_extension}'
     # The location of backups of WIP files
     maya_asset_snapshot:
         definition: '@asset_root/dev/maya/snapshots/{name}.v{version}[_{name}].{timestamp}.{maya_extension}'
     # The Location of maya clean files
     maya_asset_clean_work: 
-        definition: '@asset_root/dev/maya/{name}.clean.{Step}.v{version}.{maya_extension}'
+        definition: '@asset_root/dev/maya/{extension.maya}/{name}.clean.{Step}.v{version}.{maya_extension}'
     # The location of published maya files
     maya_asset_publish:
-        definition: '@asset_root/pub/maya/{name}.{Step}.v{version}.{maya_extension}'
+        definition: '@asset_root/pub/maya/{extension.maya}/{name}.{Step}.v{version}.{maya_extension}'
         # definition: '@asset_root/pub/maya/{name}.v{version}[_{name}].{maya_extension}'
 
     #
