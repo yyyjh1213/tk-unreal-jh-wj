@@ -1,6 +1,11 @@
 """
-Hook for exporting Maya files as FBX for Unreal Engine.
-Handles FBX export settings and texture conversion for Unreal compatibility.
+Maya 파일을 Unreal Engine용 FBX로 내보내기 위한 훅입니다.
+FBX 내보내기 설정과 Unreal 호환성을 위한 텍스처 변환을 처리합니다.
+
+주요 기능:
+1. Maya 씬을 Unreal Engine에 최적화된 FBX 형식으로 내보내기
+2. 텍스처 자동 변환 및 최적화
+3. FBX 내보내기 설정 관리 (버전, 스케일, 선택 객체 등)
 """
 import os
 import maya.cmds as cmds
@@ -11,23 +16,32 @@ HookBaseClass = sgtk.get_hook_baseclass()
 
 class MayaFBXUnrealExportPlugin(HookBaseClass):
     """
-    Plugin for exporting Maya FBX files optimized for Unreal Engine.
-    Handles FBX export settings and texture conversion.
+    Unreal Engine에 최적화된 Maya FBX 파일 내보내기를 위한 플러그인입니다.
+    FBX 내보내기 설정과 텍스처 변환을 담당합니다.
+    
+    주요 설정:
+    - Export Selection: 선택된 객체만 내보내기
+    - FBX Version: FBX 파일 버전 설정
+    - Convert Textures: 프로시저럴 텍스처를 파일 텍스처로 변환
+    - Scale Factor: 내보내기 시 적용할 스케일 값
     """
 
     @property
     def name(self):
-        """The name of this plugin."""
+        """플러그인의 이름을 반환합니다."""
         return "Maya FBX Unreal Export"
 
     @property
     def description(self):
-        """The description of this plugin."""
+        """플러그인의 설명을 반환합니다."""
         return "Export Maya scene as FBX file optimized for Unreal Engine."
 
     @property
     def settings(self):
-        """The plugin settings."""
+        """
+        플러그인의 설정을 정의합니다.
+        각 설정은 사용자가 퍼블리시 시 조정할 수 있는 옵션들입니다.
+        """
         return {
             "Export Selection": {
                 "type": "bool",
@@ -53,7 +67,7 @@ class MayaFBXUnrealExportPlugin(HookBaseClass):
 
     def validate(self, settings, item):
         """
-        Validate the scene for export.
+        씬을 내보내기 전에 검증합니다.
         """
         if settings.get("Export Selection", True) and not cmds.ls(selection=True):
             self.logger.warning("Nothing selected for export.")
@@ -70,7 +84,7 @@ class MayaFBXUnrealExportPlugin(HookBaseClass):
 
     def export_fbx(self, settings, item):
         """
-        Export the scene or selection as FBX.
+        Maya 씬을 FBX 형식으로 내보냅니다.
         """
         try:
             # Clean up node names first
@@ -117,7 +131,7 @@ class MayaFBXUnrealExportPlugin(HookBaseClass):
 
     def _find_unsupported_textures(self):
         """
-        Find texture nodes that are not supported for FBX export.
+        지원되지 않는 텍스처 노드를 찾습니다.
         """
         unsupported_types = ['checker', 'ramp']
         unsupported = []
@@ -130,7 +144,7 @@ class MayaFBXUnrealExportPlugin(HookBaseClass):
 
     def _convert_procedural_textures(self):
         """
-        Convert procedural textures to file textures using Maya's native functionality.
+        프로시저럴 텍스처를 파일 텍스처로 변환합니다.
         """
         # Get all materials in the scene
         materials = cmds.ls(mat=True)
@@ -182,7 +196,7 @@ class MayaFBXUnrealExportPlugin(HookBaseClass):
 
     def _convert_nurbs_to_polygons(self):
         """
-        Convert NURBS surfaces to polygons before export.
+        NURBS 표면을 폴리곤으로 변환합니다.
         """
         # Get all NURBS surfaces in the scene or selection
         nurbs_surfaces = cmds.ls(selection=True, type=['nurbsSurface', 'revolvedSurface', 'nurbsBooleanSurface']) if cmds.ls(selection=True) else cmds.ls(type=['nurbsSurface', 'revolvedSurface', 'nurbsBooleanSurface'])
@@ -220,7 +234,7 @@ class MayaFBXUnrealExportPlugin(HookBaseClass):
 
     def _clean_node_names(self):
         """
-        Clean up node names to prevent conflicts.
+        노드 이름을 정리합니다.
         """
         # Get all transforms in the scene or selection
         nodes = cmds.ls(selection=True, long=True) if cmds.ls(selection=True) else cmds.ls(long=True)

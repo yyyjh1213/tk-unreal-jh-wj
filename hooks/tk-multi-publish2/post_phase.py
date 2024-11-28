@@ -18,34 +18,36 @@ HookBaseClass = sgtk.get_hook_baseclass()
 
 class PostPhase(HookBaseClass):
     """
-    This hook defines methods that are executed after each phase of a publish: validation, publish, and finalization.
-    Each method receives the PublishTree tree instance being used by the publisher,
-    giving full control to further curate the publish tree including the publish items and the tasks attached to them.
-    See the PublishTree documentation for additional details on how to traverse the tree and manipulate it.
+    퍼블리시 단계 이후에 실행되는 후처리 훅입니다.
+    각 퍼블리시 단계(검증, 퍼블리시, 마무리)가 완료된 후 실행되는 메서드들을 정의합니다.
+
+    작동 원리:
+    1. 퍼블리시 트리를 통해 모든 퍼블리시된 아이템에 접근
+    2. 각 아이템의 상태를 검사하고 필요한 후처리 작업 수행
+    3. 퍼블리시 결과에 따른 추가 작업 실행 (예: 알림, 로그 기록 등)
+    """
+
+    """
+    퍼블리시의 각 단계 이후에 실행되는 메서드들을 정의하는 훅 클래스입니다.
+    
+    주요 기능:
+    - 검증 단계 이후 처리 (post_validate)
+    - 퍼블리시 단계 이후 처리 (post_publish)
+    - 마무리 단계 이후 처리 (post_finalize)
+    
+    각 메서드는 PublishTree 인스턴스를 받아 퍼블리시된 아이템들을 처리할 수 있습니다.
     """
 
     def post_publish(self, publish_tree):
         """
-        This method is executed after the publish pass has completed for each
-        item in the tree, before the finalize pass.
-
-        A :ref:`publish-api-tree` instance representing the items that were
-        published is supplied as an argument. The tree can be traversed in this
-        method to inspect the items and process them collectively.
-
-        To glean information about the publish state of particular items, you
-        can iterate over the items in the tree and introspect their
-        :py:attr:`~.api.PublishItem.properties` dictionary. This requires
-        customizing your publish plugins to populate any specific publish
-        information that you want to process collectively here.
-
-        .. warning:: You will not be able to use the item's
-            :py:attr:`~.api.PublishItem.local_properties` in this hook since
-            :py:attr:`~.api.PublishItem.local_properties` are only accessible
-            during the execution of a publish plugin.
-
-        :param publish_tree: The :ref:`publish-api-tree` instance representing
-            the items to be published.
+        퍼블리시 단계가 완료된 후, 마무리 단계 전에 실행되는 메서드입니다.
+        
+        작동 과정:
+        1. 퍼블리시 트리의 모든 아이템을 순회
+        2. 각 아이템의 properties를 검사하여 퍼블리시 상태 확인
+        3. 필요한 후처리 작업 수행
+        
+        참고: local_properties는 퍼블리시 플러그인 실행 중에만 접근 가능합니다.
         """
         
         # Iterate through all items in the publish tree
@@ -246,27 +248,14 @@ class PostPhase(HookBaseClass):
 
     def post_finalize(self, publish_tree):
         """
-        This method is executed after the finalize pass has completed for each
-        item in the tree.
-
-        A :ref:`publish-api-tree` instance representing the items that were
-        published and finalized is supplied as an argument. The tree can be
-        traversed in this method to inspect the items and process them
-        collectively.
-
-        To glean information about the finalize state of particular items, you
-        can iterate over the items in the tree and introspect their
-        :py:attr:`~.api.PublishItem.properties` dictionary. This requires
-        customizing your publish plugins to populate any specific finalize
-        information that you want to process collectively here.
-
-        .. warning:: You will not be able to use the item's
-            :py:attr:`~.api.PublishItem.local_properties` in this hook since
-            :py:attr:`~.api.PublishItem.local_properties` are only accessible
-            during the execution of a publish plugin.
-
-        :param publish_tree: The :ref:`publish-api-tree` instance representing
-            the items to be published.
+        퍼블리시 단계가 완료된 후, 마무리 단계 전에 실행되는 메서드입니다.
+        
+        작동 과정:
+        1. 퍼블리시 트리의 모든 아이템을 순회
+        2. 각 아이템의 properties를 검사하여 퍼블리시 상태 확인
+        3. 필요한 후처리 작업 수행
+        
+        참고: local_properties는 퍼블리시 플러그인 실행 중에만 접근 가능합니다.
         """
         
         bg_processing = publish_tree.root_item.properties.get("bg_processing")
