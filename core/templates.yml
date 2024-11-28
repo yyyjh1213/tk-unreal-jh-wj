@@ -353,30 +353,20 @@ paths:
     
     # define the location of a work area
     shot_work_area_maya:
-        definition: '@shot_root/dev/maya'
+        definition: '@shot_root/work/maya'
     # define the location of a publish area
     shot_publish_area_maya:
-        definition: '@shot_root/pub/maya'
+        definition: '@shot_root/publish/maya'
     # The location of WIP files
     maya_shot_work:
-        definition: '@shot_root/dev/maya/{extension}/{name}.v{version}[_{name}].{extension}'
+        definition: '@shot_root/work/maya/{name}.v{version}.{maya_extension}'
+        root_name: primary
     # The location of backups of WIP files
     maya_shot_snapshot:
-        definition: '@shot_root/dev/maya/snapshots/{name}.v{version}[_{name}].{timestamp}.{extension}'
+        definition: '@shot_root/work/maya/snapshots/{name}.v{version}[_{name}].{timestamp}.{maya_extension}'
     # The location of published maya files
     maya_shot_publish:
-        definition: '@shot_root/pub/maya/{extension}/{name}.v{version}[_{name}].{extension}'
-
-    # Maya clean templates
-    # Clean 저장 시 사용되는 템플릿
-    # {name}.clean.{Step}.v{version}.fbx 형식으로 파일명 생성
-    # clean 폴더 내에 저장됨
-    maya_shot_clean_work:
-        definition: '@shot_root/dev/maya/clean/{name}.clean.{Step}.v{version}.fbx'
-        root_name: primary
-
-    maya_asset_clean_work:
-        definition: '@asset_root/dev/maya/clean/{name}.clean.{Step}.v{version}.fbx'
+        definition: '@shot_root/publish/maya/{name}.v{version}.{maya_extension}'
         root_name: primary
 
     # Maya FBX publish
@@ -626,26 +616,20 @@ paths:
 
     # define the location of a work area
     asset_work_area_maya:
-        definition: '@asset_root/dev/maya'
+        definition: '@asset_root/work/maya'
     # define the location of a publish area
     asset_publish_area_maya:
-        definition: '@asset_root/pub/maya'
+        definition: '@asset_root/publish/maya'
     # The location of WIP files
     maya_asset_work:
-        definition: '@asset_root/dev/maya/{extension}/{name}.{Step}.v{version}.{extension}'
+        definition: '@asset_root/work/maya/{name}.{Step}.v{version}.{maya_extension}'
+        root_name: primary
     # The location of backups of WIP files
     maya_asset_snapshot:
-        definition: '@asset_root/dev/maya/snapshots/{name}.v{version}[_{name}].{timestamp}.{maya_extension}'
+        definition: '@asset_root/work/maya/snapshots/{name}.v{version}[_{name}].{timestamp}.{maya_extension}'
     # The location of published maya files
     maya_asset_publish:
-        definition: '@asset_root/pub/maya/{extension}/{name}.{Step}.v{version}.{extension}'
-
-    # Maya clean templates
-    # Clean 저장 시 사용되는 템플릿
-    # {name}.clean.{Step}.v{version}.fbx 형식으로 파일명 생성
-    # clean 폴더 내에 저장됨
-    maya_asset_clean_work:
-        definition: '@asset_root/dev/maya/clean/{name}.clean.{Step}.v{version}.fbx'
+        definition: '@asset_root/publish/maya/{name}.{Step}.v{version}.{maya_extension}'
         root_name: primary
 
     #

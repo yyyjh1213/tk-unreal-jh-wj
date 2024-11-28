@@ -1,5 +1,5 @@
 """
-Hook for performing operations with maya.
+Hook called when performing a scene operation with Toolkit.
 """
 import maya.cmds as cmds
 import maya.mel as mel
@@ -10,166 +10,64 @@ HookBaseClass = sgtk.get_hook_baseclass()
 
 class SceneOperation(HookBaseClass):
     """
-    Hook called to perform an operation with the
-    current scene
+    Hook called when performing a scene operation with Toolkit.
     """
-    
-    def _export_clean_fbx(self, file_path):
-        """
-        Clean 모드로 FBX 파일을 내보내는 헬퍼 함수
-        
-        :param file_path: 원본 저장 경로
-        :return: 실제 저장된 FBX 파일 경로
-        """
-        # clean 저장을 위한 새로운 폴더 경로 생성
-        folder = os.path.dirname(file_path)
-        clean_folder = os.path.join(folder, "clean")
-        self.parent.ensure_folder_exists(clean_folder)
-        
-        # 파일명에 .clean 추가하고 버전 정보 유지
-        file_name = os.path.basename(file_path)
-        name, ext = os.path.splitext(file_name)
-        if ".v" in name:
-            # 버전 번호가 있는 경우 처리
-            base_name = name.split(".v")[0]
-            version = name.split(".v")[1]
-            clean_name = f"{base_name}.clean.v{version}.fbx"
-        else:
-            # 버전 번호가 없는 경우 처리
-            clean_name = f"{name}.clean.fbx"
-        
-        # clean 폴더에 FBX로 내보내기
-        clean_path = os.path.join(clean_folder, clean_name)
-        
-        # FBX 내보내기 옵션 설정
-        mel.eval('FBXResetExport')  # FBX 내보내기 옵션 초기화
-        
-        # FBX 내보내기 기본 설정 - Unreal Engine 호환성
-        mel.eval('FBXExportFileVersion -v FBX201900')  # FBX 2019 버전 사용
-        mel.eval('FBXExportUpAxis -v y')  # Y-up axis
-        mel.eval('FBXExportScaleFactor -v 1.0')  # Scale factor 1.0
-        
-        # 메시 설정
-        mel.eval('FBXExportSmoothingGroups -v 1')  # Smoothing groups 활성화
-        mel.eval('FBXExportHardEdges -v 0')
-        mel.eval('FBXExportTangents -v 1')  # Tangents/Binormals 내보내기
-        mel.eval('FBXExportSmoothMesh -v 1')
-        mel.eval('FBXExportInstances -v 1')  # 인스턴스 내보내기
-        mel.eval('FBXExportQuaternion -v euler')  # 회전값을 Euler로 내보내기
-        
-        # 애니메이션 설정
-        mel.eval('FBXExportAnimationOnly -v 0')
-        mel.eval('FBXExportBakeComplexAnimation -v 1')
-        mel.eval('FBXExportBakeComplexStart -v 0')
-        mel.eval('FBXExportBakeComplexEnd -v 1')
-        mel.eval('FBXExportBakeComplexStep -v 1')
-        
-        # 재질 및 텍스처 설정
-        mel.eval('FBXExportMaterials -v 1')  # 재질 내보내기
-        mel.eval('FBXExportTextures -v 1')  # 텍스처 내보내기
-        mel.eval('FBXExportEmbeddedTextures -v 0')  # 텍스처 파일 임베드하지 않음
-        
-        # 기타 설정
-        mel.eval('FBXExportTriangulate -v 1')  # 모든 지오메트리를 삼각형으로 변환
-        mel.eval('FBXExportInAscii -v 0')  # Binary 형식으로 내보내기
-        mel.eval('FBXExportConstraints -v 0')  # 컨스트레인트 제외
-        mel.eval('FBXExportLights -v 0')  # 라이트 제외
-        mel.eval('FBXExportCameras -v 0')  # 카메라 제외
-        mel.eval('FBXExportReferencedAssetsContent -v 1')
-        mel.eval('FBXExportUseSceneName -v 0')
-        
-        # 선택된 오브젝트만 내보내기
-        all_transforms = cmds.ls(selection=True, type="transform", long=True)
-        if not all_transforms:
-            # 선택된 것이 없으면 모든 transform을 선택
-            all_transforms = cmds.ls(type="transform", long=True)
-            cmds.select(all_transforms, replace=True)
-        
-        # FBX 파일로 내보내기
-        cmds.file(clean_path, force=True, exportSelected=True, type="FBX export")
-        
-        # 현재 씬도 저장
-        cmds.file(save=True, force=True)
-        
-        return clean_path
 
     def execute(self, operation, file_path, context, parent_action, file_version, read_only, **kwargs):
         """
-        Main hook entry point
-
+        Main hook entry point.
+        
         :param operation:       String
                               Scene operation to perform
-
-        :param file_path:       String
-                              File path to use if the operation
-                              requires it (e.g. open)
-
-        :param context:         Context
-                              The context the file operation is being
-                              performed in.
-
-        :param parent_action:   This is the action that this scene operation is
+        :param file_path:      String
+                              File path to use if the operation requires it
+        :param context:        Context
+                              The context the file operation is being performed in.
+        :param parent_action:  This is the action that this scene operation is
                               being executed for.  This can be one of:
                               - open_file
                               - new_file
                               - save_file_as
                               - version_up
-
-        :param file_version:    The version/revision of the file to be opened.  If this is 'None'
-                              then the latest version should be opened.
-
-        :param read_only:       Specifies if the file should be opened read-only or not
-        
-        :param kwargs:          Additional arguments dictionary that includes:
-                              - clean_enabled: Boolean flag indicating if clean save is enabled
+        :param file_version:   The version number of the file to be opened.  If
+                              parent_action is 'version_up', this will be the
+                              next version number.
+        :param read_only:      Specifies if the file should be opened read-only or
+                              not                        
+        :returns:             Depends on operation:
+                             'current_path' - Return the current scene file path as a String
+                             all others     - Return None
+        """
+        # 모든 scene operation 코드를 주석 처리
         """
         if operation == "current_path":
-            # 현재 씬 파일 경로 반환
+            # return the current scene path
             return cmds.file(query=True, sceneName=True)
+        elif operation == "open":
+            # do new scene as Maya doesn't like opening 
+            # the scene it currently has open!    
+            cmds.file(new=True, force=True) 
+            cmds.file(file_path, open=True)
+        elif operation == "save":
+            # save the current scene:
+            cmds.file(save=True)
+        elif operation == "save_as":
+            # first rename the scene as file_path:
+            cmds.file(rename=file_path)
             
-        # 모든 파일 작업에서 폴더 존재 확인
-        folder = os.path.dirname(file_path)
-        self.parent.ensure_folder_exists(folder)
-
-        if operation == "open":
-            # 파일 열기
-            cmds.file(file_path, open=True, force=True)
+            # Maya can choose the wrong file type so
+            # we should set it here explicitly based
+            # on the extension
+            maya_file_type = None
+            if file_path.lower().endswith(".ma"):
+                maya_file_type = "mayaAscii"
+            elif file_path.lower().endswith(".mb"):
+                maya_file_type = "mayaBinary"
             
-        elif operation in ["save", "save_as"]:
-            # 체크박스에서 clean 옵션이 선택되었는지 확인
-            clean_enabled = kwargs.get("clean_enabled", False)
-            
-            if clean_enabled:
-                self._export_clean_fbx(file_path)
+            # save the scene:
+            if maya_file_type:
+                cmds.file(save=True, type=maya_file_type)
             else:
-                # 일반 저장
-                cmds.file(rename=file_path)
-                cmds.file(save=True, force=True)
-                
-        elif operation == "reset":
-            """
-            Reset the scene to an empty state
-            """
-            while cmds.file(query=True, modified=True):
-                # Scene has been modified:
-                res = cmds.confirmDialog(title="Save your scene?",
-                                       message="Your scene has unsaved changes. Save before proceeding?",
-                                       button=["Save", "Don't Save", "Cancel"],
-                                       defaultButton="Save",
-                                       cancelButton="Cancel",
-                                       dismissString="Cancel")
-
-                if res == "Save":
-                    scene_name = cmds.file(query=True, sceneName=True)
-                    if not scene_name:
-                        cmds.SaveSceneAs()
-                    else:
-                        cmds.file(save=True)
-                elif res == "Cancel":
-                    return False
-                else:
-                    break
-
-            # do new file:
-            cmds.file(newFile=True, force=True)
-            return True
+                cmds.file(save=True)
+        """
+        pass
