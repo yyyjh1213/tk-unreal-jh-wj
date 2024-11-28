@@ -359,14 +359,14 @@ paths:
         definition: '@shot_root/pub/maya'
     # The location of WIP files
     maya_shot_work:
-        definition: '@shot_root/dev/maya/{name}.v{version}.{maya_extension}'
+        definition: '@shot_root/dev/maya/{extension}/{name}.v{version}.{maya_extension}'
         root_name: primary
     # The location of backups of WIP files
     maya_shot_snapshot:
         definition: '@shot_root/dev/maya/snapshots/{name}.v{version}[_{name}].{timestamp}.{maya_extension}'
     # The location of published maya files
     maya_shot_publish:
-        definition: '@shot_root/pub/maya/{name}.v{version}.{maya_extension}'
+        definition: '@shot_root/pub/maya/{extension}/{name}.v{version}.{maya_extension}'
         root_name: primary
 
     #
@@ -614,14 +614,14 @@ paths:
         definition: '@asset_root/pub/maya'
     # The location of WIP files
     maya_asset_work:
-        definition: '@asset_root/dev/maya/{name}.{Step}.v{version}.{maya_extension}'
+        definition: '@asset_root/dev/maya/{extension}/{name}.{Step}.v{version}.{maya_extension}'
         root_name: primary
     # The location of backups of WIP files
     maya_asset_snapshot:
         definition: '@asset_root/dev/maya/snapshots/{name}.v{version}[_{name}].{timestamp}.{maya_extension}'
     # The location of published maya files
     maya_asset_publish:
-        definition: '@asset_root/pub/maya/{name}.{Step}.v{version}.{maya_extension}'
+        definition: '@asset_root/pub/maya/{extension}/{name}.{Step}.v{version}.{maya_extension}'
         root_name: primary
 
     #
