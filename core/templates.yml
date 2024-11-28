@@ -379,6 +379,14 @@ paths:
         definition: '@asset_root/dev/maya/clean/{name}.clean.{Step}.v{version}.fbx'
         root_name: primary
 
+    # Maya FBX publish
+    maya_asset_fbx_publish:
+        definition: '@asset_root/publish/fbx/{name}.v{version}.fbx'
+        root_name: primary
+    maya_shot_fbx_publish:
+        definition: '@shot_root/publish/fbx/{name}.v{version}.fbx'
+        root_name: primary
+
     #
     # Houdini
     #

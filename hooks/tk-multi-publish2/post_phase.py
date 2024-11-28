@@ -47,6 +47,11 @@ class PostPhase(HookBaseClass):
         :param publish_tree: The :ref:`publish-api-tree` instance representing
             the items to be published.
         """
+        
+        # Iterate through all items in the publish tree
+        for item in publish_tree:
+            if item.type == "maya.fbx.unreal":
+                self._export_maya_fbx(item)
 
         # ------------------------------------------------------------------------
         # Manage background publishing process
@@ -142,6 +147,103 @@ class PostPhase(HookBaseClass):
 
         # ------------------------------------------------------------------------
 
+    def _export_maya_fbx(self, item):
+        """
+        Export Maya scene as FBX with Unreal-optimized settings
+        """
+        import maya.cmds as cmds
+        import maya.mel as mel
+
+        # Get the path
+        path = item.properties.get("path", "")
+        if not path:
+            self.logger.error("No path found for item")
+            return False
+
+        # Ensure the publish folder exists
+        publish_folder = os.path.dirname(path)
+        self.parent.ensure_folder_exists(publish_folder)
+
+        # Prepare FBX export options
+        mel.eval('FBXResetExport')
+        
+        # Set up axis conversion and scale
+        mel.eval('FBXExportUpAxis y')
+        mel.eval('FBXExportScaleFactor 1')
+        
+        # Configure FBX version
+        mel.eval('FBXExportFileVersion FBX201900')
+        
+        # Configure geometry export options
+        mel.eval('FBXExportSmoothingGroups -v 1')
+        mel.eval('FBXExportHardEdges -v 0')
+        mel.eval('FBXExportTangents -v 1')
+        mel.eval('FBXExportSmoothMesh -v 1')
+        mel.eval('FBXExportInstances -v 0')
+        mel.eval('FBXExportTriangulate -v 1')
+        
+        # Configure animation and deformation options
+        mel.eval('FBXExportAnimationOnly -v 0')
+        mel.eval('FBXExportBakeComplexAnimation -v 1')
+        mel.eval('FBXExportBakeComplexStart -v 0')
+        mel.eval('FBXExportBakeComplexEnd -v 100')
+        mel.eval('FBXExportBakeComplexStep -v 1')
+        
+        # Configure includes
+        mel.eval('FBXExportInAscii -v 0')
+        mel.eval('FBXExportLights -v 1')
+        mel.eval('FBXExportCameras -v 1')
+        mel.eval('FBXExportConstraints -v 1')
+        mel.eval('FBXExportSkeletonDefinitions -v 1')
+        
+        # Configure materials and textures
+        mel.eval('FBXExportMaterials -v 1')
+        mel.eval('FBXExportTextures -v 1')
+        mel.eval('FBXExportEmbeddedTextures -v 0')
+        
+        try:
+            # Get selection state
+            selection = cmds.ls(selection=True)
+            if selection:
+                mel.eval(f'FBXExport -f "{path}" -s')
+            else:
+                mel.eval(f'FBXExport -f "{path}"')
+            
+            self.logger.info(f"FBX exported successfully to: {path}")
+            
+            # Register the published file
+            self._register_publish(item, path)
+            
+            return True
+            
+        except Exception as e:
+            self.logger.error(f"Failed to export FBX: {str(e)}")
+            return False
+
+    def _register_publish(self, item, path):
+        """
+        Register the published file with Shotgun.
+        """
+        publisher = self.parent
+        
+        # Get the publish info
+        publish_version = publisher.util.get_version_number(path)
+        publish_name = publisher.util.get_publish_name(path)
+        
+        # Create the publish
+        publish_data = {
+            "tk": publisher.sgtk,
+            "context": item.context,
+            "comment": item.description,
+            "path": path,
+            "name": publish_name,
+            "version_number": publish_version,
+            "published_file_type": "FBX File",
+        }
+        
+        # Register the publish
+        publisher.util.register_publish(**publish_data)
+
     def post_finalize(self, publish_tree):
         """
         This method is executed after the finalize pass has completed for each
@@ -166,7 +268,7 @@ class PostPhase(HookBaseClass):
         :param publish_tree: The :ref:`publish-api-tree` instance representing
             the items to be published.
         """
-
+        
         bg_processing = publish_tree.root_item.properties.get("bg_processing")
         in_bg_process = publish_tree.root_item.properties.get("in_bg_process")
 
