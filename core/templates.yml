@@ -141,6 +141,8 @@ keys:
         choices:
             ma: Maya Ascii (.ma)
             mb: Maya Binary (.mb)
+            fbx: FBX (.fbx)
+            abc: Alembic (.abc)
         default: mb
         alias: extension
     tail:
@@ -614,14 +616,14 @@ paths:
         definition: '@asset_root/pub/maya'
     # The location of WIP files
     maya_asset_work:
-        definition: '@asset_root/dev/maya/{extension}/{name}.{Step}.v{version}.{extension}'
+        definition: '@asset_root/dev/maya/{extension}/{name}.{Step}.v{version}.{maya_extension}'
         root_name: primary
     # The location of backups of WIP files
     maya_asset_snapshot:
         definition: '@asset_root/dev/maya/snapshots/{name}.v{version}[_{name}].{timestamp}.{maya_extension}'
     # The location of published maya files
     maya_asset_publish:
-        definition: '@asset_root/pub/maya/{extension}/{name}.{Step}.v{version}.{extension}'
+        definition: '@asset_root/pub/maya/{extension}/{name}.{Step}.v{version}.{maya_extension}'
         root_name: primary
 
     #
