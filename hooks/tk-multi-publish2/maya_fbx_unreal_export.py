@@ -73,6 +73,12 @@ class MayaFBXUnrealExportPlugin(HookBaseClass):
         Export the scene or selection as FBX.
         """
         try:
+            # Clean up node names first
+            self._clean_node_names()
+            
+            # Convert NURBS to polygons
+            self._convert_nurbs_to_polygons()
+            
             # Convert textures if needed
             if settings.get("Convert Textures", True):
                 self._convert_procedural_textures()
@@ -95,6 +101,7 @@ class MayaFBXUnrealExportPlugin(HookBaseClass):
             mel.eval('FBXExportCameras -v false')
             mel.eval('FBXExportBakeComplexAnimation -v false')
             mel.eval('FBXExportEmbeddedTextures -v true')
+            mel.eval('FBXExportTriangulate -v true')
             
             # Export selected or all
             if settings.get("Export Selection", True):
@@ -172,3 +179,78 @@ class MayaFBXUnrealExportPlugin(HookBaseClass):
                 except Exception as e:
                     self.logger.warning(f"Failed to convert texture {texture}: {str(e)}")
                     continue
+
+    def _convert_nurbs_to_polygons(self):
+        """
+        Convert NURBS surfaces to polygons before export.
+        """
+        # Get all NURBS surfaces in the scene or selection
+        nurbs_surfaces = cmds.ls(selection=True, type=['nurbsSurface', 'revolvedSurface', 'nurbsBooleanSurface']) if cmds.ls(selection=True) else cmds.ls(type=['nurbsSurface', 'revolvedSurface', 'nurbsBooleanSurface'])
+        
+        if not nurbs_surfaces:
+            return
+            
+        self.logger.info("Converting NURBS surfaces to polygons...")
+        
+        for surface in nurbs_surfaces:
+            try:
+                # Get the transform node
+                transform = cmds.listRelatives(surface, parent=True)[0]
+                
+                # Convert NURBS to polygons
+                poly = cmds.nurbsToPoly(transform, 
+                    format=3,  # NURBS to polygons
+                    polygonType=1,  # Triangle
+                    constructionHistory=False,
+                    name=transform + "_poly")[0]
+                
+                # Copy materials from NURBS to polygon
+                shading_groups = cmds.listConnections(surface, type='shadingEngine')
+                if shading_groups:
+                    cmds.sets(poly, edit=True, forceElement=shading_groups[0])
+                
+                # Delete the original NURBS surface
+                cmds.delete(transform)
+                
+                self.logger.info(f"Converted {surface} to polygon mesh")
+                
+            except Exception as e:
+                self.logger.warning(f"Failed to convert {surface} to polygon: {str(e)}")
+                continue
+
+    def _clean_node_names(self):
+        """
+        Clean up node names to prevent conflicts.
+        """
+        # Get all transforms in the scene or selection
+        nodes = cmds.ls(selection=True, long=True) if cmds.ls(selection=True) else cmds.ls(long=True)
+        
+        for node in nodes:
+            try:
+                # Skip if it's a long path
+                if '|' not in node:
+                    continue
+                    
+                # Get the short name
+                short_name = node.split('|')[-1]
+                
+                # Skip if no namespace
+                if ':' not in short_name:
+                    continue
+                    
+                # Get namespace and base name
+                namespace, base_name = short_name.split(':', 1)
+                
+                # Remove numbers from the end of the name
+                clean_name = ''.join(c for c in base_name if not c.isdigit())
+                
+                # Create a unique name
+                unique_name = namespace + ':' + clean_name
+                
+                # Rename the node if it's different
+                if unique_name != short_name:
+                    cmds.rename(node, unique_name)
+                    
+            except Exception as e:
+                self.logger.warning(f"Failed to clean name for {node}: {str(e)}")
+                continue
