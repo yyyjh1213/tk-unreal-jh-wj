@@ -369,10 +369,10 @@ paths:
 
     # Maya clean templates
     # Clean 저장 시 사용되는 템플릿
-    # {name}.clean.{Step}.v{version}.{maya_extension} 형식으로 파일명 생성
+    # {name}.clean.{Step}.v{version}.fbx 형식으로 파일명 생성
     # clean 폴더 내에 저장됨
     maya_shot_clean_work:
-        definition: '@shot_root/work/maya/clean/{name}.clean.{Step}.v{version}.{maya_extension}'
+        definition: '@shot_root/work/maya/clean/{name}.clean.{Step}.v{version}.fbx'
         root_name: primary
 
     #
@@ -633,10 +633,10 @@ paths:
 
     # Maya clean templates
     # Clean 저장 시 사용되는 템플릿
-    # {name}.clean.{Step}.v{version}.{maya_extension} 형식으로 파일명 생성
+    # {name}.clean.{Step}.v{version}.fbx 형식으로 파일명 생성
     # clean 폴더 내에 저장됨
     maya_asset_clean_work:
-        definition: '@asset_root/work/maya/clean/{name}.clean.{Step}.v{version}.{maya_extension}'
+        definition: '@asset_root/work/maya/clean/{name}.clean.{Step}.v{version}.fbx'
         root_name: primary
 
     #
