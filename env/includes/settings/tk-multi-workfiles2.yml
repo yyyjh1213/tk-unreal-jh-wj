@@ -83,12 +83,9 @@ settings.tk-multi-workfiles2.launch_at_startup:
 
 settings.tk-multi-workfiles2.3dsmax:
   <<: *settings_tk-multi-workfiles2
-  ui_config_hook: '{self}/ui_config.py:{engine}/tk-multi-workfiles2/basic/ui_config.py'
-  hook_scene_operation: "{engine}/tk-multi-workfiles2/basic/scene_operation.py"
+  location: "@apps.tk-multi-workfiles2.location"
 
 settings.tk-multi-workfiles2.3dsmax.asset_step:
-  ui_config_hook: '{self}/ui_config.py:{engine}/tk-multi-workfiles2/basic/ui_config.py'
-  hook_scene_operation: "{engine}/tk-multi-workfiles2/basic/scene_operation.py"
   template_publish: max_asset_publish
   template_publish_area: asset_publish_area_max
   template_work: max_asset_work
@@ -115,8 +112,6 @@ settings.tk-multi-workfiles2.3dsmax.asset_step:
   location: "@apps.tk-multi-workfiles2.location"
 
 settings.tk-multi-workfiles2.3dsmax.shot_step:
-  ui_config_hook: '{self}/ui_config.py:{engine}/tk-multi-workfiles2/basic/ui_config.py'
-  hook_scene_operation: "{engine}/tk-multi-workfiles2/basic/scene_operation.py"
   template_publish: max_shot_publish
   template_publish_area: shot_publish_area_max
   template_work: max_shot_work
@@ -184,7 +179,6 @@ settings.tk-multi-workfiles2.houdini:
       filters:
       link_field: entity
       hierarchy: [step]
-  ui_config_hook: '{self}/ui_config.py:{engine}/tk-multi-workfiles2/basic/ui_config.py'
   location: "@apps.tk-multi-workfiles2.location"
 
 # Houdini launches at startup.
@@ -209,7 +203,6 @@ settings.tk-multi-workfiles2.houdini.launch_at_startup:
       filters:
       link_field: entity
       hierarchy: [step]
-  ui_config_hook: '{self}/ui_config.py:{engine}/tk-multi-workfiles2/basic/ui_config.py'
   location: "@apps.tk-multi-workfiles2.location"
 
 # asset_step
@@ -237,7 +230,6 @@ settings.tk-multi-workfiles2.houdini.asset_step:
       filters:
       link_field: entity
       hierarchy: [step]
-  ui_config_hook: '{self}/ui_config.py:{engine}/tk-multi-workfiles2/basic/ui_config.py'
   location: "@apps.tk-multi-workfiles2.location"
 
 # shot_step
@@ -265,8 +257,7 @@ settings.tk-multi-workfiles2.houdini.shot_step:
       filters:
       link_field: entity
       hierarchy: [step]
-  ui_config_hook: '{self}/ui_config.py:{engine}/tk-multi-workfiles2/basic/ui_config.py'
-  location: '@apps.tk-multi-workfiles2.location'
+  location: "@apps.tk-multi-workfiles2.location"
 
 ################################################################################
 
@@ -330,7 +321,7 @@ settings.tk-multi-workfiles2.maya.shot_step:
       filters:
       link_field: entity
       hierarchy: [step]
-  location: '@apps.tk-multi-workfiles2.location'
+  location: "@apps.tk-multi-workfiles2.location"
 
 ################################################################################
 
@@ -473,7 +464,6 @@ settings.tk-multi-workfiles2.aftereffects:
       filters:
       link_field: entity
       hierarchy: [step]
-  hook_scene_operation: "{engine}/tk-multi-workfiles2/basic/scene_operation.py"
   location: "@apps.tk-multi-workfiles2.location"
 
 # asset_step
@@ -501,7 +491,6 @@ settings.tk-multi-workfiles2.aftereffects.asset_step:
       filters:
       link_field: entity
       hierarchy: [step]
-  hook_scene_operation: "{engine}/tk-multi-workfiles2/basic/scene_operation.py"
   location: "@apps.tk-multi-workfiles2.location"
 
 # shot_step
@@ -529,7 +518,6 @@ settings.tk-multi-workfiles2.aftereffects.shot_step:
       filters:
       link_field: entity
       hierarchy: [step]
-  hook_scene_operation: "{engine}/tk-multi-workfiles2/basic/scene_operation.py"
   location: "@apps.tk-multi-workfiles2.location"
 
 ################################################################################
@@ -610,7 +598,6 @@ settings.tk-multi-workfiles2.alias:
       filters:
         - [task_assignees.Group.users, is, '{context.user}']
         - [task_assignees, is, '{context.user}']
-  hook_scene_operation: "{engine}/tk-multi-workfiles2/basic/scene_operation.py"
   location: "@apps.tk-multi-workfiles2.location"
 
 # asset_step
@@ -634,7 +621,6 @@ settings.tk-multi-workfiles2.alias.asset_step:
       filters:
         - [task_assignees.Group.users, is, '{context.user}']
         - [task_assignees, is, '{context.user}']
-  hook_scene_operation: "{engine}/tk-multi-workfiles2/basic/scene_operation.py"
   location: "@apps.tk-multi-workfiles2.location"
 
 ################################################################################
@@ -659,7 +645,6 @@ settings.tk-multi-workfiles2.vred:
       filters:
         - [task_assignees.Group.users, is, '{context.user}']
         - [task_assignees, is, '{context.user}']
-  hook_scene_operation: "{engine}/tk-multi-workfiles2/basic/scene_operation.py"
   location: "@apps.tk-multi-workfiles2.location"
 
 # asset_step
@@ -683,7 +668,6 @@ settings.tk-multi-workfiles2.vred.asset_step:
       filters:
         - [task_assignees.Group.users, is, '{context.user}']
         - [task_assignees, is, '{context.user}']
-  hook_scene_operation: "{engine}/tk-multi-workfiles2/basic/scene_operation.py"
   location: "@apps.tk-multi-workfiles2.location"
 
 ################################################################################
