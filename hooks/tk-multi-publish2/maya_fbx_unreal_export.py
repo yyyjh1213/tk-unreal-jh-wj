@@ -71,6 +71,8 @@ class MayaFBXUnrealExportPlugin(HookBaseClass):
         # Set up axis conversion and scale
         mel.eval('FBXExportUpAxis y')
         mel.eval('FBXExportScaleFactor 1')
+        mel.eval('FBXExportConvertUnitString cm')  # Add unit conversion
+        mel.eval('FBXExportAxisConversionMethod none')  # Prevent axis conversion issues
         
         # Configure FBX version
         mel.eval(f'FBXExportFileVersion {settings["FBX Version"].value}')
@@ -82,6 +84,9 @@ class MayaFBXUnrealExportPlugin(HookBaseClass):
         mel.eval('FBXExportSmoothMesh -v 1')
         mel.eval('FBXExportInstances -v 0')
         mel.eval('FBXExportTriangulate -v 1')
+        mel.eval('FBXExportQuaternion -v euler')  # Add quaternion export mode
+        mel.eval('FBXExportShapes -v 1')  # Export blend shapes
+        mel.eval('FBXExportSkins -v 1')  # Export skin deformations
         
         # Configure animation and deformation options
         mel.eval('FBXExportAnimationOnly -v 0')
@@ -89,11 +94,13 @@ class MayaFBXUnrealExportPlugin(HookBaseClass):
         mel.eval('FBXExportBakeComplexStart -v 0')
         mel.eval('FBXExportBakeComplexEnd -v 100')
         mel.eval('FBXExportBakeComplexStep -v 1')
+        mel.eval('FBXExportReferencedAssetsContent -v 1')  # Include referenced assets
+        mel.eval('FBXExportInputConnections -v 1')  # Export input connections
         
         # Configure includes
-        mel.eval('FBXExportInAscii -v 0')
-        mel.eval('FBXExportLights -v 1')
-        mel.eval('FBXExportCameras -v 1')
+        mel.eval('FBXExportInAscii -v 1')  # Change to ASCII format for better compatibility
+        mel.eval('FBXExportLights -v 0')  # Disable lights export
+        mel.eval('FBXExportCameras -v 0')  # Disable cameras export
         mel.eval('FBXExportConstraints -v 1')
         mel.eval('FBXExportSkeletonDefinitions -v 1')
         
