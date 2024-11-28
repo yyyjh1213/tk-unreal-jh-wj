@@ -3,12 +3,13 @@ Hook for publishing Maya FBX files to Unreal Engine.
 """
 import os
 import sgtk
+from . import maya_fbx_unreal_export
 
 HookBaseClass = sgtk.get_hook_baseclass()
 
-class MayaFBXUnrealPublishPlugin(HookBaseClass):
+class MayaFBXPublishPlugin(HookBaseClass):
     """
-    Plugin for publishing Maya FBX files optimized for Unreal Engine.
+    Plugin for publishing Maya FBX files to Shotgrid and Unreal Engine.
     """
 
     @property
@@ -24,13 +25,20 @@ class MayaFBXUnrealPublishPlugin(HookBaseClass):
     @property
     def settings(self):
         """The plugin settings."""
-        return {
+        # Combine settings from both plugins
+        base_settings = {
             "Publish Template": {
                 "type": "template",
                 "default": None,
                 "description": "Template path for published files. Should correspond to a template defined in templates.yml.",
-            },
+            }
         }
+        
+        # Get export settings from the exporter
+        exporter = maya_fbx_unreal_export.MayaFBXUnrealExportPlugin(self.parent)
+        base_settings.update(exporter.settings)
+        
+        return base_settings
 
     def accept(self, settings, item):
         """
@@ -46,6 +54,11 @@ class MayaFBXUnrealPublishPlugin(HookBaseClass):
         
         if not path:
             self.logger.error("No path found for item")
+            return False
+            
+        # Create exporter instance for validation
+        exporter = maya_fbx_unreal_export.MayaFBXUnrealExportPlugin(self.parent)
+        if not exporter.validate(settings, item):
             return False
             
         return True
@@ -64,11 +77,9 @@ class MayaFBXUnrealPublishPlugin(HookBaseClass):
         publish_folder = os.path.dirname(path)
         self.parent.ensure_folder_exists(publish_folder)
         
-        # Export the FBX file using our custom exporter
-        fbx_hook = self.load_framework("tk-framework-mayautils").import_module("maya_fbx_unreal_export")
-        fbx_exporter = fbx_hook.MayaFBXUnrealExportPlugin(self.parent)
-        
-        if not fbx_exporter.export_fbx(settings, item):
+        # Export the FBX file using our exporter
+        exporter = maya_fbx_unreal_export.MayaFBXUnrealExportPlugin(self.parent)
+        if not exporter.export_fbx(settings, item):
             self.logger.error("Failed to export FBX file")
             return False
         
@@ -98,5 +109,5 @@ class MayaFBXUnrealPublishPlugin(HookBaseClass):
             "published_file_type": "FBX File",
         }
         
-        # Register the publish
-        publisher.util.register_publish(**publish_data)
+        # Register the publish using the base class implementation
+        super(MayaFBXPublishPlugin, self)._register_publish(settings, item, path)

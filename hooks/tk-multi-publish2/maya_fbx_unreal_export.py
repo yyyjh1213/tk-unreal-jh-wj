@@ -1,5 +1,6 @@
 """
 Hook for exporting Maya files as FBX for Unreal Engine.
+Handles FBX export settings and texture conversion for Unreal compatibility.
 """
 import os
 import maya.cmds as cmds
@@ -10,7 +11,8 @@ HookBaseClass = sgtk.get_hook_baseclass()
 
 class MayaFBXUnrealExportPlugin(HookBaseClass):
     """
-    Plugin for publishing Maya FBX files optimized for Unreal Engine.
+    Plugin for exporting Maya FBX files optimized for Unreal Engine.
+    Handles FBX export settings and texture conversion.
     """
 
     @property
@@ -37,20 +39,88 @@ class MayaFBXUnrealExportPlugin(HookBaseClass):
                 "default": "FBX201900",
                 "description": "FBX file version to use.",
             },
+            "Convert Textures": {
+                "type": "bool",
+                "default": True,
+                "description": "Convert procedural textures to file textures before export.",
+            },
+            "Scale Factor": {
+                "type": "float",
+                "default": 1.0,
+                "description": "Scale factor for the exported FBX.",
+            }
         }
 
     def validate(self, settings, item):
         """
-        Validate the item before export.
+        Validate the scene for export.
         """
-        if not cmds.ls(selection=True) and settings["Export Selection"]:
+        if settings.get("Export Selection", True) and not cmds.ls(selection=True):
             self.logger.warning("Nothing selected for export.")
             return False
-            
-        # Convert procedural textures to file textures
-        self._convert_procedural_textures()
+
+        # Check for unsupported texture nodes
+        if settings.get("Convert Textures", True):
+            unsupported = self._find_unsupported_textures()
+            if unsupported:
+                self.logger.warning(f"Found unsupported textures: {unsupported}")
+                return False
+
         return True
+
+    def export_fbx(self, settings, item):
+        """
+        Export the scene or selection as FBX.
+        """
+        try:
+            # Convert textures if needed
+            if settings.get("Convert Textures", True):
+                self._convert_procedural_textures()
+
+            # Get export path
+            path = item.properties["path"]
+            
+            # Prepare FBX export options
+            mel.eval('FBXResetExport')
+            
+            # Set FBX export settings
+            mel.eval('FBXExportFileVersion -v "{}"'.format(settings.get("FBX Version", "FBX201900")))
+            mel.eval('FBXExportUpAxis -v "y"')
+            mel.eval('FBXExportScaleFactor -v {}'.format(settings.get("Scale Factor", 1.0)))
+            mel.eval('FBXExportShapes -v true')
+            mel.eval('FBXExportSmoothingGroups -v true')
+            mel.eval('FBXExportSkins -v true')
+            mel.eval('FBXExportConstraints -v false')
+            mel.eval('FBXExportLights -v false')
+            mel.eval('FBXExportCameras -v false')
+            mel.eval('FBXExportBakeComplexAnimation -v false')
+            mel.eval('FBXExportEmbeddedTextures -v true')
+            
+            # Export selected or all
+            if settings.get("Export Selection", True):
+                mel.eval('FBXExport -f "{}" -s'.format(path.replace("\\", "/")))
+            else:
+                mel.eval('FBXExport -f "{}"'.format(path.replace("\\", "/")))
+            
+            return True
+            
+        except Exception as e:
+            self.logger.error(f"Failed to export FBX: {str(e)}")
+            return False
+
+    def _find_unsupported_textures(self):
+        """
+        Find texture nodes that are not supported for FBX export.
+        """
+        unsupported_types = ['checker', 'ramp']
+        unsupported = []
         
+        for node_type in unsupported_types:
+            nodes = cmds.ls(type=node_type) or []
+            unsupported.extend(nodes)
+            
+        return unsupported
+
     def _convert_procedural_textures(self):
         """
         Convert procedural textures to file textures using Maya's native functionality.
@@ -102,96 +172,3 @@ class MayaFBXUnrealExportPlugin(HookBaseClass):
                 except Exception as e:
                     self.logger.warning(f"Failed to convert texture {texture}: {str(e)}")
                     continue
-
-    def export_fbx(self, settings, item):
-        """
-        Export the Maya scene as FBX with Unreal-optimized settings.
-        """
-        # Get the path
-        path = item.properties.get("path", "")
-        if not path:
-            self.logger.error("No output path set.")
-            return None
-
-        # Ensure the output folder exists
-        output_folder = os.path.dirname(path)
-        self.parent.ensure_folder_exists(output_folder)
-
-        # Get export selection mode
-        export_selection = settings["Export Selection"].value
-
-        # Prepare FBX export options
-        mel.eval('FBXResetExport')
-        
-        # Set up axis conversion and scale
-        mel.eval('FBXExportUpAxis y')
-        mel.eval('FBXExportScaleFactor 1')
-        mel.eval('FBXExportConvertUnitString cm')  # Add unit conversion
-        mel.eval('FBXExportAxisConversionMethod none')  # Prevent axis conversion issues
-        
-        # Configure FBX version
-        mel.eval(f'FBXExportFileVersion {settings["FBX Version"].value}')
-        
-        # Configure geometry export options
-        mel.eval('FBXExportSmoothingGroups -v 1')
-        mel.eval('FBXExportHardEdges -v 0')
-        mel.eval('FBXExportTangents -v 1')
-        mel.eval('FBXExportSmoothMesh -v 1')
-        mel.eval('FBXExportInstances -v 0')
-        mel.eval('FBXExportTriangulate -v 1')
-        mel.eval('FBXExportQuaternion -v euler')  # Add quaternion export mode
-        mel.eval('FBXExportShapes -v 1')  # Export blend shapes
-        mel.eval('FBXExportSkins -v 1')  # Export skin deformations
-        
-        # Configure animation and deformation options
-        mel.eval('FBXExportAnimationOnly -v 0')
-        mel.eval('FBXExportBakeComplexAnimation -v 1')
-        mel.eval('FBXExportBakeComplexStart -v 0')
-        mel.eval('FBXExportBakeComplexEnd -v 100')
-        mel.eval('FBXExportBakeComplexStep -v 1')
-        mel.eval('FBXExportReferencedAssetsContent -v 1')  # Include referenced assets
-        mel.eval('FBXExportInputConnections -v 1')  # Export input connections
-        
-        # Configure includes
-        mel.eval('FBXExportInAscii -v 1')  # Change to ASCII format for better compatibility
-        mel.eval('FBXExportLights -v 0')  # Disable lights export
-        mel.eval('FBXExportCameras -v 0')  # Disable cameras export
-        mel.eval('FBXExportConstraints -v 1')
-        mel.eval('FBXExportSkeletonDefinitions -v 1')
-        
-        # Configure materials and textures
-        mel.eval('FBXExportMaterials -v 1')
-        mel.eval('FBXExportTextures -v 1')
-        mel.eval('FBXExportEmbeddedTextures -v 0')
-        
-        try:
-            # Perform the export
-            if export_selection:
-                mel.eval(f'FBXExport -f "{path}" -s')
-            else:
-                mel.eval(f'FBXExport -f "{path}"')
-            
-            self.logger.info(f"FBX exported successfully to: {path}")
-            return True
-            
-        except Exception as e:
-            self.logger.error(f"Failed to export FBX: {str(e)}")
-            return False
-
-    def execute(self, settings, item):
-        """
-        Execute the plugin.
-        """
-        # Validate the export
-        if not self.validate(settings, item):
-            return False
-            
-        # Perform the export
-        result = self.export_fbx(settings, item)
-        
-        if not result:
-            self.logger.error("Failed to export FBX file.")
-            return False
-            
-        self.logger.info("FBX Export completed successfully.")
-        return True
