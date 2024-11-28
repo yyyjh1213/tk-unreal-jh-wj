@@ -53,81 +53,51 @@ class MayaFBXUnrealExportPlugin(HookBaseClass):
         
     def _convert_procedural_textures(self):
         """
-        Convert procedural textures to file textures.
+        Convert procedural textures to file textures using Maya's native functionality.
         """
         # Get all materials in the scene
         materials = cmds.ls(mat=True)
         
         for material in materials:
             # Get all textures connected to the material
-            textures = cmds.listConnections(material, type='texture2d') or []
-            textures.extend(cmds.listConnections(material, type='place2dTexture') or [])
-            textures.extend(cmds.listConnections(material, type='checker') or [])
+            textures = cmds.listConnections(material, type='checker') or []
             
             for texture in textures:
-                # Skip if it's already a file texture
-                if cmds.nodeType(texture) == 'file':
-                    continue
-                    
                 try:
                     # Get the texture's output connections
                     connections = cmds.listConnections(texture, plugs=True, connections=True, destination=True) or []
                     
                     if connections:
-                        # Create a new file texture node
-                        file_node = cmds.shadingNode('file', asTexture=True)
+                        # Get the checker pattern colors
+                        color1 = cmds.getAttr(f'{texture}.color1')[0]
+                        color2 = cmds.getAttr(f'{texture}.color2')[0]
+                        
+                        # Create a new ramp node instead
+                        ramp_node = cmds.shadingNode('ramp', asTexture=True)
                         place2d = cmds.shadingNode('place2dTexture', asUtility=True)
                         
-                        # Connect place2dTexture to file node
-                        cmds.connectAttr(f'{place2d}.coverage', f'{file_node}.coverage')
-                        cmds.connectAttr(f'{place2d}.translateFrame', f'{file_node}.translateFrame')
-                        cmds.connectAttr(f'{place2d}.rotateFrame', f'{file_node}.rotateFrame')
-                        cmds.connectAttr(f'{place2d}.mirrorU', f'{file_node}.mirrorU')
-                        cmds.connectAttr(f'{place2d}.mirrorV', f'{file_node}.mirrorV')
-                        cmds.connectAttr(f'{place2d}.stagger', f'{file_node}.stagger')
-                        cmds.connectAttr(f'{place2d}.wrapU', f'{file_node}.wrapU')
-                        cmds.connectAttr(f'{place2d}.wrapV', f'{file_node}.wrapV')
-                        cmds.connectAttr(f'{place2d}.repeatUV', f'{file_node}.repeatUV')
-                        cmds.connectAttr(f'{place2d}.offset', f'{file_node}.offset')
-                        cmds.connectAttr(f'{place2d}.rotateUV', f'{file_node}.rotateUV')
-                        cmds.connectAttr(f'{place2d}.noiseUV', f'{file_node}.noiseUV')
-                        cmds.connectAttr(f'{place2d}.vertexUvOne', f'{file_node}.vertexUvOne')
-                        cmds.connectAttr(f'{place2d}.vertexUvTwo', f'{file_node}.vertexUvTwo')
-                        cmds.connectAttr(f'{place2d}.vertexUvThree', f'{file_node}.vertexUvThree')
-                        cmds.connectAttr(f'{place2d}.vertexCameraOne', f'{file_node}.vertexCameraOne')
+                        # Set up the ramp to look like a checker
+                        cmds.setAttr(f'{ramp_node}.type', 3)  # Checker type
+                        cmds.setAttr(f'{ramp_node}.interpolation', 0)  # No interpolation
+                        
+                        # Set colors
+                        cmds.setAttr(f'{ramp_node}.colorEntryList[0].color', *color1)
+                        cmds.setAttr(f'{ramp_node}.colorEntryList[1].color', *color2)
+                        
+                        # Connect place2dTexture to ramp node
+                        cmds.connectAttr(f'{place2d}.outUV', f'{ramp_node}.uv')
+                        cmds.connectAttr(f'{place2d}.outUvFilterSize', f'{ramp_node}.uvFilterSize')
                         
                         # Connect to original destinations
                         for i in range(0, len(connections), 2):
                             src = connections[i]
                             dst = connections[i+1]
-                            cmds.connectAttr(f'{file_node}.outColor', dst, force=True)
+                            cmds.connectAttr(f'{ramp_node}.outColor', dst, force=True)
                         
-                        # Set a default texture if it's a checker
-                        if cmds.nodeType(texture) == 'checker':
-                            # Create a temporary checker texture file
-                            import tempfile
-                            import os
-                            
-                            temp_dir = tempfile.gettempdir()
-                            texture_path = os.path.join(temp_dir, f'temp_checker_{texture}.png')
-                            
-                            # Create a default checker pattern
-                            from PIL import Image
-                            img = Image.new('RGB', (256, 256), color='white')
-                            pixels = img.load()
-                            
-                            # Create checker pattern
-                            for i in range(img.size[0]):
-                                for j in range(img.size[1]):
-                                    if (i // 32 + j // 32) % 2:
-                                        pixels[i,j] = (128, 128, 128)
-                            
-                            img.save(texture_path)
-                            
-                            # Assign the texture file
-                            cmds.setAttr(f'{file_node}.fileTextureName', texture_path, type="string")
+                        # Delete the original checker node
+                        cmds.delete(texture)
                         
-                        self.logger.info(f"Converted {texture} to file texture")
+                        self.logger.info(f"Converted checker {texture} to ramp texture")
                         
                 except Exception as e:
                     self.logger.warning(f"Failed to convert texture {texture}: {str(e)}")
