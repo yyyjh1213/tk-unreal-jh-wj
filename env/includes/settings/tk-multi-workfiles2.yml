@@ -277,7 +277,7 @@ settings.tk-multi-workfiles2.maya.asset_step:
   template_work: maya_asset_work
   template_work_area: asset_work_area_maya
   template_clean: maya_asset_clean_work
-  hook_scene_operation: "{engine}/tk-multi-workfiles2/basic/scene_operation.py:{config}/hooks/scene_operation_tk-maya.py"
+  hook_scene_operation: "{config}/hooks/scene_operation_tk-maya.py"
   ui_config_hook: "{config}/hooks/tk-multi-workfiles2/ui/clean_save_dialog.py"
   entities:
   - caption: Assets
