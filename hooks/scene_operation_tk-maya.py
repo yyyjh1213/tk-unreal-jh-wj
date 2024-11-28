@@ -44,11 +44,18 @@ class SceneOperation(HookBaseClass):
         # FBX 내보내기 옵션 설정
         mel.eval('FBXResetExport')  # FBX 내보내기 옵션 초기화
         
-        # FBX 내보내기 기본 설정
-        mel.eval('FBXExportFileVersion -v FBX201800')  # FBX 2018 버전
-        mel.eval('FBXExportInputConnections -v 0')
-        mel.eval('FBXExportIncludeChildren -v 1')
-        mel.eval('FBXExportInAscii -v 1')  # ASCII 형식으로 내보내기
+        # FBX 내보내기 기본 설정 - Unreal Engine 호환성
+        mel.eval('FBXExportFileVersion -v FBX201900')  # FBX 2019 버전 사용
+        mel.eval('FBXExportUpAxis -v y')  # Y-up axis
+        mel.eval('FBXExportScaleFactor -v 1.0')  # Scale factor 1.0
+        
+        # 메시 설정
+        mel.eval('FBXExportSmoothingGroups -v 1')  # Smoothing groups 활성화
+        mel.eval('FBXExportHardEdges -v 0')
+        mel.eval('FBXExportTangents -v 1')  # Tangents/Binormals 내보내기
+        mel.eval('FBXExportSmoothMesh -v 1')
+        mel.eval('FBXExportInstances -v 1')  # 인스턴스 내보내기
+        mel.eval('FBXExportQuaternion -v euler')  # 회전값을 Euler로 내보내기
         
         # 애니메이션 설정
         mel.eval('FBXExportAnimationOnly -v 0')
@@ -57,19 +64,29 @@ class SceneOperation(HookBaseClass):
         mel.eval('FBXExportBakeComplexEnd -v 1')
         mel.eval('FBXExportBakeComplexStep -v 1')
         
-        # 기하학 설정
-        mel.eval('FBXExportSmoothingGroups -v 1')
-        mel.eval('FBXExportHardEdges -v 0')
-        mel.eval('FBXExportTangents -v 0')
-        mel.eval('FBXExportSmoothMesh -v 1')
-        mel.eval('FBXExportInstances -v 0')
+        # 재질 및 텍스처 설정
+        mel.eval('FBXExportMaterials -v 1')  # 재질 내보내기
+        mel.eval('FBXExportTextures -v 1')  # 텍스처 내보내기
+        mel.eval('FBXExportEmbeddedTextures -v 0')  # 텍스처 파일 임베드하지 않음
         
         # 기타 설정
+        mel.eval('FBXExportTriangulate -v 1')  # 모든 지오메트리를 삼각형으로 변환
+        mel.eval('FBXExportInAscii -v 0')  # Binary 형식으로 내보내기
+        mel.eval('FBXExportConstraints -v 0')  # 컨스트레인트 제외
+        mel.eval('FBXExportLights -v 0')  # 라이트 제외
+        mel.eval('FBXExportCameras -v 0')  # 카메라 제외
         mel.eval('FBXExportReferencedAssetsContent -v 1')
         mel.eval('FBXExportUseSceneName -v 0')
         
+        # 선택된 오브젝트만 내보내기
+        all_transforms = cmds.ls(selection=True, type="transform", long=True)
+        if not all_transforms:
+            # 선택된 것이 없으면 모든 transform을 선택
+            all_transforms = cmds.ls(type="transform", long=True)
+            cmds.select(all_transforms, replace=True)
+        
         # FBX 파일로 내보내기
-        cmds.file(clean_path, force=True, exportAll=True, type="FBX export")
+        cmds.file(clean_path, force=True, exportSelected=True, type="FBX export")
         
         # 현재 씬도 저장
         cmds.file(save=True, force=True)
