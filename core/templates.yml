@@ -375,6 +375,10 @@ paths:
         definition: '@shot_root/dev/maya/clean/{name}.clean.{Step}.v{version}.fbx'
         root_name: primary
 
+    maya_asset_clean_work:
+        definition: '@asset_root/dev/maya/clean/{name}.clean.{Step}.v{version}.fbx'
+        root_name: primary
+
     #
     # Houdini
     #
