@@ -174,23 +174,51 @@ class UnrealSessionCollector(HookBaseClass):
 
     def collect_selected_assets(self, parent_item):
         """
-        Creates items for assets selected in Unreal.
-
+        Creates items for all Level Sequences and selected assets in Unreal.
+        
         :param parent_item: Parent Item instance
         """
         unreal_sg = sgtk.platform.current_engine().unreal_sg_engine
-        sequence_edits = None
-        # Iterate through the selected assets and get their info and add them as items to be published
+        
+        # First collect all Level Sequences in the project
+        sequence_edits = self.retrieve_sequence_edits()
+        asset_helper = unreal.AssetRegistryHelpers.get_asset_registry()
+        level_sequence_class = unreal.TopLevelAssetPath("/Script/LevelSequence", "LevelSequence")
+        
+        # Get all Level Sequences in the project
+        all_level_sequences = asset_helper.get_assets_by_class(level_sequence_class)
+        
+        # Create items for all Level Sequences first
+        for level_sequence_asset in all_level_sequences:
+            asset_path = "%s" % unreal_sg.object_path(level_sequence_asset)
+            asset_name = "%s" % level_sequence_asset.asset_name
+            level_sequence = unreal.load_asset(asset_path)
+            
+            if level_sequence:
+                for edits_path in self.get_all_paths_from_sequence(level_sequence, sequence_edits):
+                    # Reverse the path to have it from top master sequence to the shot
+                    edits_path.reverse()
+                    self.logger.info("Collected %s" % [x.get_name() for x in edits_path])
+                    if len(edits_path) > 1:
+                        display_name = "%s (%s)" % (edits_path[0].get_name(), edits_path[-1].get_name())
+                    else:
+                        display_name = edits_path[0].get_name()
+                    
+                    item = self.create_asset_item(
+                        parent_item,
+                        edits_path[0].get_path_name(),
+                        "LevelSequence",
+                        edits_path[0].get_name(),
+                        display_name,
+                    )
+                    # Store the edits on the item so we can leverage them later when publishing
+                    item.properties["edits_path"] = edits_path
+        
+        # Then collect any other selected assets that aren't Level Sequences
         for asset in unreal_sg.selected_assets:
-            if asset.asset_class_path.asset_name == "LevelSequence":
-                if sequence_edits is None:
-                    sequence_edits = self.retrieve_sequence_edits()
-                self.collect_level_sequence(parent_item, asset, sequence_edits)
-            else:
+            if asset.asset_class_path.asset_name != "LevelSequence":
                 self.create_asset_item(
                     parent_item,
-                    # :class:`Name` instances, we cast them to strings otherwise
-                    # string operations fail down the line..
                     "%s" % unreal_sg.object_path(asset),
                     "%s" % asset.asset_class_path.asset_name,
                     "%s" % asset.asset_name,
