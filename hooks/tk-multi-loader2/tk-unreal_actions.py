@@ -142,7 +142,7 @@ class UnrealActions(HookBaseClass):
 
         destination_path, destination_name = self._get_destination_path_and_name(sg_publish_data)
 
-        asset_path = _unreal_import_fbx_asset(path, destination_path, destination_name)
+        asset_path = self._unreal_import_fbx_asset(path, destination_path, destination_name)
 
         if asset_path:
             self._set_asset_metadata(asset_path, sg_publish_data)
@@ -205,9 +205,6 @@ class UnrealActions(HookBaseClass):
 
         unreal.EditorAssetLibrary.save_loaded_asset(asset)
 
-    ##############################################################################################################
-    # helper methods which can be subclassed in custom hooks to fine tune the behaviour of things
-
     def _get_destination_path_and_name(self, sg_publish_data):
         """
         Get the destination path and name from the publish data and the templates
@@ -268,6 +265,125 @@ class UnrealActions(HookBaseClass):
             destination_name = _sanitize_name(sg_publish_data["code"])
 
         return destination_path, destination_name
+
+    def _get_fbx_metadata(self, sg_publish_data):
+        """
+        FBX 파일의 ShotGrid 메타데이터 정보를 가져옵니다.
+        
+        :param sg_publish_data: ShotGrid publish data dictionary
+        :return: 메타데이터 정보를 담은 dictionary
+        """
+        metadata = {
+            "name": sg_publish_data.get("name", ""),
+            "version": sg_publish_data.get("version_number", 0),
+            "task": sg_publish_data.get("task.Task.content", ""),
+            "entity": sg_publish_data.get("entity.Asset.code", ""),
+            "project": sg_publish_data.get("project.Project.name", ""),
+            "created_by": sg_publish_data.get("created_by.HumanUser.name", ""),
+            "created_at": sg_publish_data.get("created_at", ""),
+            "description": sg_publish_data.get("description", "")
+        }
+        return metadata
+
+    def _display_metadata(self, metadata):
+        """
+        메타데이터 정보를 Unreal 에디터에 표시합니다.
+        
+        :param metadata: 메타데이터 dictionary
+        """
+        message = f"""
+        Asset Information:
+        - Name: {metadata['name']}
+        - Version: {metadata['version']}
+        - Task: {metadata['task']}
+        - Entity: {metadata['entity']}
+        - Project: {metadata['project']}
+        - Created By: {metadata['created_by']}
+        - Created At: {metadata['created_at']}
+        - Description: {metadata['description']}
+        """
+        
+        unreal.log_warning(message)
+        
+        # Unreal 에디터에 노티피케이션 표시
+        notification = unreal.EditorNotification()
+        notification.text = f"Imported: {metadata['name']} (v{metadata['version']})"
+        notification.image = None
+        notification.fade_in_duration = 0.5
+        notification.fade_out_duration = 0.5
+        notification.expire_duration = 5.0
+        unreal.EditorNotificationUtils.add_notification(notification)
+
+    def _unreal_import_fbx_asset(self, input_path, destination_path, destination_name):
+        """
+        Import an FBX into Unreal Content Browser
+
+        :param input_path: The fbx file to import
+        :param destination_path: The Content Browser path where the asset will be placed
+        :param destination_name: The asset name to use; if None, will use the filename without extension
+        """
+        import_task = self._generate_fbx_import_task(input_path, destination_path, destination_name)
+        
+        try:
+            # FBX 임포트 실행
+            unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([import_task])
+            imported_assets = import_task.get_editor_property("imported_object_paths")
+            
+            if imported_assets:
+                # 메타데이터 표시
+                metadata = self._get_fbx_metadata(self.parent.sg_publish_data)
+                self._display_metadata(metadata)
+                
+                return imported_assets[0]
+        except Exception as e:
+            unreal.log_error(f"Failed to import FBX: {str(e)}")
+            return None
+
+    ##############################################################################################################
+    # helper methods which can be subclassed in custom hooks to fine tune the behaviour of things
+
+    def _generate_fbx_import_task(
+        self,
+        filename,
+        destination_path,
+        destination_name=None,
+        replace_existing=True,
+        automated=True,
+        save=True,
+        materials=True,
+        textures=True,
+        as_skeletal=False
+    ):
+        """
+        Create and configure an Unreal AssetImportTask
+
+        :param filename: The fbx file to import
+        :param destination_path: The Content Browser path where the asset will be placed
+        :return the configured AssetImportTask
+        """
+        task = unreal.AssetImportTask()
+        task.filename = filename
+        task.destination_path = destination_path
+
+        # By default, destination_name is the filename without the extension
+        if destination_name is not None:
+            task.destination_name = destination_name
+
+        task.replace_existing = replace_existing
+        task.automated = automated
+        task.save = save
+
+        task.options = unreal.FbxImportUI()
+        task.options.import_materials = materials
+        task.options.import_textures = textures
+        task.options.import_as_skeletal = as_skeletal
+        # task.options.static_mesh_import_data.combine_meshes = True
+
+        task.options.mesh_type_to_import = unreal.FBXImportType.FBXIT_STATIC_MESH
+        if as_skeletal:
+            task.options.mesh_type_to_import = unreal.FBXImportType.FBXIT_SKELETAL_MESH
+
+        return task
 
 
 """
