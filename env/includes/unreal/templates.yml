@@ -52,13 +52,13 @@ paths:
     unreal.maya_turntable_render:
         definition: '@asset_root/review/unreal/{extension}/{name}_turntable_v{version}.{ue_mov_ext}'
     unreal.maya_turntable_publish:
-        definition: '@asset_root/review/{Asset}_{name}_turntable_v{version}.{ue_mov_ext}'
+        definition: '@asset_root/pub/unreal/turntable/{name}_turntable_v{version}.{extension}'
+    # The location of published Unreal assets
+    unreal.asset_publish:
+        definition: '@asset_root/pub/unreal/assets/{Asset}/{sg_asset_type}/{name}.v{version}.fbx'
     # Placeholder location for static mesh assets exported from Unreal
     # Hook implementation intended to be a starting point for a pipeline
     # No context info used in template, developers expected to further customize
-    unreal.asset_publish:
-        definition: '@asset_root/pub/unreal/{extension}/{YYYY}_{MM}_{DD}/{name}.v{version}.fbx'
-    #Location of dev fbx files
     unreal.asset_work:
         definition: '@asset_root/dev/unreal/{extension}/{YYYY}_{MM}_{DD}/{name}.v{version}.fbx'
 
