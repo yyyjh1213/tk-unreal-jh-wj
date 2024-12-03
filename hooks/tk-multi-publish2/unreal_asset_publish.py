@@ -78,6 +78,53 @@ class UnrealAssetPublishPlugin(HookBaseClass):
         """
         return ["unreal.asset.StaticMesh"]
 
+    def accept(self, settings, item):
+        """
+        Method called by the publisher to determine if an item is of any interest to this plugin.
+        Only items matching the filters defined via the item_filters property will be presented to this method.
+        
+        A publish task will be generated for each item accepted here. Returns a dictionary with the following booleans:
+            accepted: Indicates if the plugin is interested in this value at all. Required.
+            enabled: If True, the plugin will be enabled in the UI, otherwise it will be disabled. Optional, True by default.
+            visible: If True, the plugin will be visible in the UI, otherwise it will be hidden. Optional, True by default.
+            checked: If True, the plugin will be checked in the UI, otherwise it will be unchecked. Optional, True by default.
+        """
+        
+        # Get the path in a normalized state
+        asset_path = item.properties.get("asset_path")
+        asset_name = item.properties.get("asset_name")
+        
+        if not asset_path or not asset_name:
+            self.logger.warn("Asset path or name not found for item")
+            return {"accepted": False}
+            
+        # Set the path on the item properties - this is needed by the base plugin
+        item.properties["path"] = asset_path
+        
+        # Get publish template from settings
+        publish_template = self.get_publish_template(settings, item)
+        if publish_template:
+            item.properties["publish_template"] = publish_template
+        
+        return {
+            "accepted": True,
+            "checked": True
+        }
+
+    def get_publish_template(self, settings, item):
+        """
+        Get the publish template from the settings.
+        """
+        # Get the template from the settings
+        publish_template = settings.get("Publish Template").value
+        if not publish_template:
+            self.logger.debug(
+                "No publish template defined for item: %s" % item.name
+            )
+            return None
+
+        return self.parent.engine.get_template_by_name(publish_template)
+
     def validate(self, settings, item):
         """
         Validates the given item to check that it is ok to publish.
