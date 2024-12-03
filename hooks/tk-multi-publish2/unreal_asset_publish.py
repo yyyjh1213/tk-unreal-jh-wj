@@ -159,7 +159,24 @@ class UnrealAssetPublishPlugin(HookBaseClass):
 
         # Add required template fields from context
         fields["Asset"] = context.entity["name"]
-        fields["sg_asset_type"] = context.entity["sg_asset_type"]
+        
+        # Safely get asset type
+        asset_type = context.entity.get("sg_asset_type")
+        if not asset_type:
+            # Try to get type from entity type
+            asset_type = context.entity.get("type", "Asset")
+            self.logger.warning(
+                "Asset type not found in ShotGrid. Using default type: %s" % asset_type,
+                extra={
+                    "action_button": {
+                        "label": "Configure Asset",
+                        "tooltip": "Set asset type in ShotGrid",
+                        "callback": lambda: self.parent.engine.show_panel("tk-multi-shotgunpanel")
+                    }
+                }
+            )
+        
+        fields["sg_asset_type"] = asset_type
         
         # Get step from context
         if context.step is None:
