@@ -51,9 +51,9 @@ paths:
         root_name: primary
     # The location of turntable review output rendered in Unreal
     unreal.maya_turntable_render:
-        definition: '@asset_root/review/unreal/{extension}/{name}_turntable_v{version}.{ue_mov_ext}'
+        definition: '@asset_root/review/{name}_turntable_v{version}.{ue_mov_ext}'
     unreal.maya_turntable_publish:
-        definition: '@asset_root/pub/unreal/turntable/{name}_turntable_v{version}.mov'
+        definition: '@asset_root/review/{name}_turntable_v{version}.mov'
     # The location of published Unreal assets
     unreal.asset_publish:
         definition: '@asset_root/pub/unreal/fbx/{name}.{Step}.v{version}.fbx'
