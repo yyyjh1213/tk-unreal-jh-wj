@@ -194,15 +194,15 @@ class UnrealAssetPublishPlugin(HookBaseClass):
             
         fields["Step"] = context.step["name"]
         
-        # Add version number
-        fields["version"] = self._get_next_version(item)
-        
         # Add today's date to the fields
         date = datetime.date.today()
         fields["YYYY"] = date.year
         fields["MM"] = date.month
         fields["DD"] = date.day
 
+        # Get next version number
+        fields["version"] = self._get_next_version(publish_template, fields)
+        
         # Get destination path for exported FBX from publish template
         try:
             publish_path = publish_template.apply_fields(fields)
@@ -250,37 +250,41 @@ class UnrealAssetPublishPlugin(HookBaseClass):
 
         return True
         
-    def _get_next_version(self, item):
+    def _get_next_version(self, template, fields):
         """
-        Find the next available version number for the item
+        Find the next available version number
+        
+        :param template: Template to use for version calculation
+        :param fields: Fields to use for template
+        :return: Next version number
         """
-        # Get the path in a normalized state
-        path = item.properties["publish_path"]
-        template = item.properties["publish_template"]
+        # Start with version 1
+        version = 1
         
-        # Get current version number
-        fields = template.get_fields(path)
-        version = fields.get("version", 1)
-        
-        # See if there are higher versions
-        existing_versions = self.parent.engine.tank.paths_from_template(
-            template,
-            fields,
-            skip_keys=["version"]
-        )
-        
-        if not existing_versions:
-            return version
+        # Get all existing versions
+        try:
+            existing_versions = self.parent.engine.tank.paths_from_template(
+                template,
+                fields,
+                skip_keys=["version"]
+            )
             
-        # Find highest version
-        highest_version = 0
-        for existing_version in existing_versions:
-            fields = template.get_fields(existing_version)
-            v = fields.get("version", 0)
-            if v > highest_version:
-                highest_version = v
-                
-        return highest_version + 1
+            # Find highest version
+            for existing_version in existing_versions:
+                cur_fields = template.get_fields(existing_version)
+                cur_version = cur_fields.get("version", 0)
+                if cur_version > version:
+                    version = cur_version
+                    
+            # Increment for next version
+            version += 1
+            
+        except Exception as e:
+            self.logger.debug(f"Error finding next version: {str(e)}")
+            # Return version 1 if there's any error
+            return 1
+            
+        return version
 
     def publish(self, settings, item):
         """
