@@ -315,12 +315,43 @@ class UnrealAssetPublishPlugin(HookBaseClass):
     def _unreal_export_asset_to_fbx(self, destination_path, asset_path, asset_name):
         """
         Export the asset to FBX using Unreal's export functionality.
-        """
-        # Create and configure the export task
-        export_task = self._generate_fbx_export_task(destination_path, asset_path, asset_name)
         
-        # Execute the export task
-        unreal.AssetToolsHelpers.get_asset_tools().export_assets([export_task])
+        :param destination_path: The directory where the FBX will be saved
+        :param asset_path: The Unreal asset path
+        :param asset_name: The name of the asset
+        """
+        # Ensure the asset exists
+        asset = unreal.load_asset(asset_path)
+        if not asset:
+            self.logger.error(f"Failed to load asset: {asset_path}")
+            return False
+            
+        # Create the full export path
+        export_path = os.path.join(destination_path, f"{asset_name}.fbx")
+        
+        # Ensure the destination directory exists
+        os.makedirs(destination_path, exist_ok=True)
+        
+        # Get the asset tools
+        asset_tools = unreal.AssetToolsHelpers.get_asset_tools()
+        
+        try:
+            # Export the asset
+            exported = asset_tools.export_assets(
+                [asset_path],  # 에셋 경로 목록
+                export_path    # 내보내기 경로
+            )
+            
+            if not exported:
+                self.logger.error(f"Failed to export asset to: {export_path}")
+                return False
+                
+            self.logger.info(f"Successfully exported asset to: {export_path}")
+            return True
+            
+        except Exception as e:
+            self.logger.error(f"Error exporting asset: {str(e)}")
+            return False
 
     def _generate_fbx_export_task(self, destination_path, asset_path, asset_name):
         """
