@@ -327,19 +327,27 @@ class UnrealAssetPublishPlugin(HookBaseClass):
             return False
             
         # Create the full export path
-        export_path = os.path.join(destination_path, f"{asset_name}.fbx")
+        export_path = os.path.normpath(os.path.join(destination_path, f"{asset_name}.fbx"))
         
         # Ensure the destination directory exists
-        os.makedirs(destination_path, exist_ok=True)
+        os.makedirs(os.path.dirname(export_path), exist_ok=True)
         
         # Get the asset tools
         asset_tools = unreal.AssetToolsHelpers.get_asset_tools()
         
         try:
+            # Get the clean asset path (remove /Game/ prefix if present)
+            clean_asset_path = asset_path.replace("/Game/", "/")
+            if clean_asset_path.startswith("/"):
+                clean_asset_path = clean_asset_path[1:]
+                
+            self.logger.debug(f"Exporting asset from: {clean_asset_path}")
+            self.logger.debug(f"Exporting to: {export_path}")
+            
             # Export the asset
             exported = asset_tools.export_assets(
-                [asset_path],  # 에셋 경로 목록
-                export_path    # 내보내기 경로
+                [clean_asset_path],  # 에셋 경로 목록
+                export_path          # 내보내기 경로
             )
             
             if not exported:

@@ -55,7 +55,7 @@ paths:
         definition: '@asset_root/pub/unreal/turntable/{name}_turntable_v{version}.{extension}'
     # The location of published Unreal assets
     unreal.asset_publish:
-        definition: '@asset_root/pub/unreal/assets/{Asset}/{sg_asset_type}/{name}.v{version}.fbx'
+        definition: '@asset_root/pub/unreal/fbx/{name}.{Step}.v{version}.fbx'
     # Placeholder location for static mesh assets exported from Unreal
     # Hook implementation intended to be a starting point for a pipeline
     # No context info used in template, developers expected to further customize
