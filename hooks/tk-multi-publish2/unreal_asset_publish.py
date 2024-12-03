@@ -141,15 +141,44 @@ class UnrealAssetPublishPlugin(HookBaseClass):
         fields = {"name": asset_name}
 
         # Get the current context from ShotGrid
-        context = self.parent.context
+        context = item.context
         
+        # Get entity from context
+        if context.entity is None:
+            self.logger.warning(
+                "Context has no entity! Please select a task or link this file to an asset.",
+                extra={
+                    "action_button": {
+                        "label": "Review Context",
+                        "tooltip": "Open context in ShotGrid",
+                        "callback": lambda: self.parent.engine.show_panel("tk-multi-shotgunpanel")
+                    }
+                }
+            )
+            return False
+
         # Add required template fields from context
-        fields["Asset"] = context.entity["name"] if context.entity else None
-        fields["sg_asset_type"] = context.entity["sg_asset_type"] if context.entity else None
-        fields["Step"] = context.step["name"] if context.step else None
+        fields["Asset"] = context.entity["name"]
+        fields["sg_asset_type"] = context.entity["sg_asset_type"]
         
-        # Add version number - you may want to customize this logic
-        fields["version"] = 1  # Default to version 1, or implement version detection
+        # Get step from context
+        if context.step is None:
+            self.logger.warning(
+                "Context has no step! Please select a task with a pipeline step.",
+                extra={
+                    "action_button": {
+                        "label": "Review Task",
+                        "tooltip": "Open task in ShotGrid",
+                        "callback": lambda: self.parent.engine.show_panel("tk-multi-shotgunpanel")
+                    }
+                }
+            )
+            return False
+            
+        fields["Step"] = context.step["name"]
+        
+        # Add version number
+        fields["version"] = self._get_next_version(item)
         
         # Add today's date to the fields
         date = datetime.date.today()
@@ -157,33 +186,22 @@ class UnrealAssetPublishPlugin(HookBaseClass):
         fields["MM"] = date.month
         fields["DD"] = date.day
 
-        # Validate required fields
-        required_fields = ["Asset", "sg_asset_type", "Step", "version"]
-        missing_fields = []
-        
-        for field in required_fields:
-            if not fields.get(field):
-                missing_fields.append(field)
-                
-        if missing_fields:
+        # Get destination path for exported FBX from publish template
+        try:
+            publish_path = publish_template.apply_fields(fields)
+        except Exception as e:
             self.logger.warning(
-                "Missing required ShotGrid fields for publish template: %s" % ", ".join(missing_fields),
+                f"Failed to apply fields to publish template: {str(e)}",
                 extra={
                     "action_button": {
-                        "label": "Review in ShotGrid",
-                        "tooltip": "Open ShotGrid to configure the required fields",
+                        "label": "Review Template",
+                        "tooltip": "Check template configuration",
                         "callback": lambda: self.parent.engine.show_panel("tk-multi-shotgunpanel")
                     }
                 }
             )
             return False
 
-        # Stash the Unreal asset path and name in properties
-        item.properties["asset_path"] = asset_path
-        item.properties["asset_name"] = asset_name
-
-        # Get destination path for exported FBX from publish template
-        publish_path = publish_template.apply_fields(fields)
         publish_path = os.path.normpath(publish_path)
         if not os.path.isabs(publish_path):
             # If the path is not absolute, prepend the publish folder setting.
@@ -196,6 +214,11 @@ class UnrealAssetPublishPlugin(HookBaseClass):
                     publish_path
                 )
             )
+            
+        # Log the fields and paths for debugging
+        self.logger.debug(f"Template fields: {fields}")
+        self.logger.debug(f"Publish path: {publish_path}")
+            
         item.properties["publish_path"] = publish_path
         item.properties["path"] = publish_path
 
@@ -208,8 +231,39 @@ class UnrealAssetPublishPlugin(HookBaseClass):
         # Set the Published File Type
         item.properties["publish_type"] = "Unreal FBX"
 
-        self.save_ui_settings(settings)
         return True
+        
+    def _get_next_version(self, item):
+        """
+        Find the next available version number for the item
+        """
+        # Get the path in a normalized state
+        path = item.properties["publish_path"]
+        template = item.properties["publish_template"]
+        
+        # Get current version number
+        fields = template.get_fields(path)
+        version = fields.get("version", 1)
+        
+        # See if there are higher versions
+        existing_versions = self.parent.engine.tank.paths_from_template(
+            template,
+            fields,
+            skip_keys=["version"]
+        )
+        
+        if not existing_versions:
+            return version
+            
+        # Find highest version
+        highest_version = 0
+        for existing_version in existing_versions:
+            fields = template.get_fields(existing_version)
+            v = fields.get("version", 0)
+            if v > highest_version:
+                highest_version = v
+                
+        return highest_version + 1
 
     def publish(self, settings, item):
         """
