@@ -326,8 +326,8 @@ class UnrealAssetPublishPlugin(HookBaseClass):
             self.logger.error(f"Failed to load asset: {asset_path}")
             return False
             
-        # Create the full export path
-        export_path = os.path.normpath(os.path.join(destination_path, f"{asset_name}.fbx"))
+        # Create the full export path, ensuring it uses forward slashes
+        export_path = os.path.normpath(destination_path).replace("\\", "/")
         
         # Ensure the destination directory exists
         os.makedirs(os.path.dirname(export_path), exist_ok=True)
@@ -337,7 +337,7 @@ class UnrealAssetPublishPlugin(HookBaseClass):
         
         try:
             # Get the clean asset path (remove /Game/ prefix if present)
-            clean_asset_path = asset_path.replace("/Game/", "/")
+            clean_asset_path = asset_path.replace("/Game/", "")
             if clean_asset_path.startswith("/"):
                 clean_asset_path = clean_asset_path[1:]
                 

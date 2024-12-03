@@ -47,7 +47,8 @@ paths:
         definition: '@shot_root/pub/unreal/{name}.v{version}.nk'
     # The location of FBX exports for Unreal
     unreal.maya_asset_fbx_publish:
-        definition: '@asset_root/pub/maya/{extension}/fbx/{name}.{Step}.v{version}.fbx' #maya pub 경로와 동일하게 수정
+        definition: '@asset_root/pub/unreal/fbx/{name}.{Step}.v{version}.fbx'
+        root_name: primary
     # The location of turntable review output rendered in Unreal
     unreal.maya_turntable_render:
         definition: '@asset_root/review/unreal/{extension}/{name}_turntable_v{version}.{ue_mov_ext}'
@@ -56,6 +57,7 @@ paths:
     # The location of published Unreal assets
     unreal.asset_publish:
         definition: '@asset_root/pub/unreal/fbx/{name}.{Step}.v{version}.fbx'
+        root_name: primary
     # Placeholder location for static mesh assets exported from Unreal
     # Hook implementation intended to be a starting point for a pipeline
     # No context info used in template, developers expected to further customize
