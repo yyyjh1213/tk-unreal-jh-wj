@@ -3,118 +3,144 @@
 # file included in this repository.
 
 import os
-import unreal
 import sgtk
+import unreal
 
 HookBaseClass = sgtk.get_hook_baseclass()
 
-class UnrealAssetPublishPlugin(HookBaseClass):
-    """
-    Plugin for publishing Unreal assets.
-    """
 
-    @property
-    def description(self):
-        """
-        Verbose, multi-line description of what the plugin does.
-        """
-        return """
-        Publishes the selected Unreal assets to ShotGrid. A <b>Publish</b> entry will be
-        created in ShotGrid which will include a reference to the asset. The asset
-        will be exported to the project's publish folder.
-        """
+class UnrealAssetPublisherPlugin(HookBaseClass):
+    """
+    Plugin for publishing Unreal assets to ShotGrid.
+    """
 
     @property
     def settings(self):
         """
         Dictionary defining the settings that this plugin expects to receive
-        through the settings parameter in the accept, validate, publish and
-        finalize methods.
+        through the settings parameter in the accept, validate and publish methods.
         """
-        return {
-            "Publish Template": {
-                "type": "template",
-                "default": None,
-                "description": "Template path for published assets. Should "
-                             "correspond to a template defined in templates.yml.",
+        # Inherit base settings
+        base_settings = super(UnrealAssetPublisherPlugin, self).settings
+
+        # Add Unreal specific settings
+        unreal_settings = {
+            "Asset Type": {
+                "type": "string",
+                "default": "StaticMesh",
+                "description": "Type of Unreal asset to publish (StaticMesh, SkeletalMesh, etc.)"
+            },
+            "Content Path": {
+                "type": "string",
+                "default": "/Game/Assets",
+                "description": "Path in the Unreal content browser where the asset will be saved"
             }
         }
 
+        return dict(list(base_settings.items()) + list(unreal_settings.items()))
+
     def accept(self, settings, item):
         """
-        Method called by the publisher to determine if an item is of any
-        interest to this plugin. Only items matching the filters defined via the
-        item_filters property will be presented to this method.
+        Method called by the publisher to determine if an item is of any interest to this plugin.
+
+        :param dict settings: Dictionary of Settings. The keys are strings, matching
+            the keys returned in the settings property. The values are `Setting`
+            instances.
+        :param item: Item to process
+        :returns: Accepted (boolean) and Accepted reason (str)
         """
-        return True
+        if item.type == "unreal.asset":
+            return True, "Unreal asset item accepted."
+
+        return False, "Item not of type unreal.asset"
 
     def validate(self, settings, item):
         """
         Validates the given item to check that it is ok to publish.
+
+        :param dict settings: Dictionary of Settings. The keys are strings, matching
+            the keys returned in the settings property. The values are `Setting`
+            instances.
+        :param item: Item to process
+        :returns: True if item is valid, False otherwise.
         """
+        publisher = self.parent
+        path = item.properties.get("path")
+        
+        if not path:
+            self.logger.error("No path found for item: %s" % item.name)
+            return False
+
+        if not os.path.exists(path):
+            self.logger.error("Path does not exist: %s" % path)
+            return False
+
         return True
 
     def publish(self, settings, item):
         """
         Executes the publish logic for the given item and settings.
+
+        :param dict settings: Dictionary of Settings. The keys are strings, matching
+            the keys returned in the settings property. The values are `Setting`
+            instances.
+        :param item: Item to process
         """
         publisher = self.parent
+        path = item.properties.get("path")
 
-        # Get the path in a normalized state. No trailing separator, separators
-        # are appropriate for current os, no double separators, etc.
-        path = sgtk.util.ShotgunPath.normalize(item.properties["path"])
-
-        # Ensure the publish folder exists
-        publish_folder = os.path.dirname(path)
-        self.parent.ensure_folder_exists(publish_folder)
+        # Get the path in a normalized state
+        path = sgtk.util.ShotgunPath.normalize(path)
 
         try:
-            self._publish_asset(path, item)
+            # TODO: Implement Unreal specific publish logic here
+            # This could involve:
+            # - Importing the asset into Unreal
+            # - Setting up materials
+            # - Configuring asset properties
+            # - etc.
+            self._import_asset_to_unreal(path, settings, item)
+            
+            # Let the base class register the publish
+            super(UnrealAssetPublisherPlugin, self).publish(settings, item)
+            
         except Exception as e:
-            self.logger.error("Failed to publish asset: %s" % e)
-            return False
-
-        return True
+            self.logger.error(
+                "Failed to publish Unreal asset for item: %s. Error: %s" % (item.name, str(e))
+            )
+            return None
 
     def finalize(self, settings, item):
         """
         Execute the finalization pass. This pass executes once
-        all the publish tasks have completed, and can for example
-        be used to version up files.
+        all the publish tasks have completed.
+
+        :param dict settings: Dictionary of Settings. The keys are strings, matching
+            the keys returned in the settings property. The values are `Setting`
+            instances.
+        :param item: Item to process
         """
+        # TODO: Implement any post-publish operations
+        # For example:
+        # - Cleanup temporary files
+        # - Update asset references
+        # - etc.
         pass
 
-    def _publish_asset(self, path, item):
+    def _import_asset_to_unreal(self, path, settings, item):
         """
-        Publish the Unreal asset and register with ShotGrid.
-        """
-        publisher = self.parent
-        
-        # Export the asset
-        asset_path = item.properties.get("unreal_asset_path")
-        if asset_path:
-            # Export the asset using Unreal's asset registry
-            asset_registry = unreal.AssetRegistryHelpers.get_asset_registry()
-            asset = asset_registry.get_asset_by_object_path(asset_path)
-            if asset:
-                unreal.EditorAssetLibrary.export_asset(asset_path, path)
-            else:
-                self.logger.error("Could not find asset: %s" % asset_path)
-                return False
-        
-        # Create the publish
-        publish_data = {
-            "tk": publisher.sgtk,
-            "context": item.context,
-            "comment": item.description,
-            "path": path,
-            "name": os.path.basename(path),
-            "created_by": sgtk.util.get_current_user(publisher.sgtk),
-            "version_number": publisher.util.get_version_number(path),
-            "thumbnail_path": item.get_thumbnail_as_path(),
-            "published_file_type": "Unreal Asset"
-        }
+        Helper method to import an asset into Unreal Engine.
 
-        # Create the publish and stash it in the item properties for other
-        # plugins to use.
-        item.properties["sg_publish_data"] = sgtk.util.register_publish(**publish_data)
+        :param path: Path to the asset file
+        :param settings: Publisher settings
+        :param item: Item being published
+        """
+        asset_type = settings.get("Asset Type").value
+        content_path = settings.get("Content Path").value
+
+        # TODO: Implement asset import logic based on asset_type
+        # This could use the Unreal Python API to:
+        # - Import different types of assets (StaticMesh, SkeletalMesh, etc.)
+        # - Set up materials and textures
+        # - Configure asset properties
+        pass

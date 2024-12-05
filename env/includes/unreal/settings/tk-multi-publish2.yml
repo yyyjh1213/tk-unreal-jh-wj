@@ -10,107 +10,98 @@ includes:
 - ../../app_locations.yml # env/includes/app_locations.yml
 
 settings.tk-multi-publish2.unreal.project:
-  collector: "{self}/base_collector.py:{engine}/tk-multi-publish2/basic/collector.py"
+  collector: "{config}/tk-multi-publish2/unreal_collector.py"
   publish_plugins:
-  - name: Publish to ShotGrid
-    hook: "{self}/publish_file.py"
-    settings: {}
-  - name: Upload for review
-    hook: "{self}/upload_version.py"
-    settings: {}
-  - name: Publish to ShotGrid
-    hook: "{self}/publish_file.py:{engine}/tk-multi-publish2/basic/session_publisher.py"
-    settings: {}
-  - name: Export FBX and Publish to ShotGrid
-    hook: "{self}/publish_file.py:{config}/tk-multi-publish2/unreal_asset_publisher.py"
+  - name: Publish Unreal Session
+    hook: "{config}/tk-multi-publish2/session_publisher.py"
     settings:
-        Publish Template: unreal.asset_publish
-  - name: Render Movie and Submit for Review
-    hook: "{self}/publish_file.py:{engine}/tk-multi-publish2/basic/movie_publisher.py"
+      Publish Type: Unreal Session
+      Publish Template: unreal_session_publish
+  
+  - name: Export and Publish Unreal Asset
+    hook: "{config}/tk-multi-publish2/unreal_exporter.py:{config}/tk-multi-publish2/unreal_asset_publisher.py"
     settings:
-        Publish Template: unreal.movie_publish
+      Asset Type: StaticMesh
+      Content Path: /Game/Assets
+      Export Path Template: unreal_asset_export
+      Publish Template: unreal_asset_publish
+  
+  - name: Render and Publish Movie
+    hook: "{config}/tk-multi-publish2/movie_publisher.py"
+    settings:
+      Publish Template: unreal_movie_publish
+  
   help_url: *help_url
   location: "@apps.tk-multi-publish2.location"
 
 settings.tk-multi-publish2.unreal.asset_step:
-  collector: "{self}/base_collector.py:{engine}/tk-multi-publish2/basic/collector.py"
+  collector: "{config}/tk-multi-publish2/unreal_collector.py"
   publish_plugins:
-  - name: "Publish to ShotGrid"
-    hook: "{self}/publish_file.py"
-    settings: {}
+  - name: Publish Unreal Session
+    hook: "{config}/tk-multi-publish2/session_publisher.py"
+    settings:
+      Publish Type: Unreal Session
+      Publish Template: unreal_session_publish
   
-  - name: "Upload for review"
-    hook: "{self}/upload_version.py"
-    settings: {}
-    
-  - name: "Export FBX and Publish to ShotGrid"
-    hook: "{self}/publish_file.py:{config}/tk-multi-publish2/unreal_asset_publisher.py"
+  - name: Export and Publish Unreal Asset
+    hook: "{config}/tk-multi-publish2/unreal_exporter.py:{config}/tk-multi-publish2/unreal_asset_publisher.py"
     settings:
-      Publish Template: unreal.asset_publish
-      
-  - name: "Render Movie and Submit for Review"
-    hook: "{self}/publish_file.py:{engine}/tk-multi-publish2/basic/movie_publisher.py"
+      Asset Type: StaticMesh
+      Content Path: /Game/Assets/{asset_type}/{asset_name}
+      Export Path Template: unreal_asset_export
+      Publish Template: unreal_asset_publish
+  
+  - name: Render and Publish Movie
+    hook: "{config}/tk-multi-publish2/movie_publisher.py"
     settings:
-      Publish Template: unreal.movie_publish
+      Publish Template: unreal_movie_publish
+  
   location: "@apps.tk-multi-publish2.location"
 
 settings.tk-multi-publish2.unreal.asset:
-  location: "@apps.tk-multi-publish2.location"
-  collector: "{self}/base_collector.py:{engine}/tk-multi-publish2/basic/collector.py"
+  collector: "{config}/tk-multi-publish2/unreal_collector.py"
   publish_plugins:
-  - name: "Publish to ShotGrid"
-    hook: "{self}/publish_file.py"
-    settings: {}
+  - name: Publish Unreal Session
+    hook: "{config}/tk-multi-publish2/session_publisher.py"
+    settings:
+      Publish Type: Unreal Session
+      Publish Template: unreal_session_publish
   
-  - name: "Upload for review"
-    hook: "{self}/upload_version.py"
-    settings: {}
-    
-  - name: "Export FBX and Publish to ShotGrid"
-    hook: "{self}/publish_file.py:{config}/tk-multi-publish2/unreal_asset_publisher.py"
+  - name: Export and Publish Unreal Asset
+    hook: "{config}/tk-multi-publish2/unreal_exporter.py:{config}/tk-multi-publish2/unreal_asset_publisher.py"
     settings:
-      Publish Template: unreal.asset_publish
-      
-  - name: "Render Movie and Submit for Review"
-    hook: "{self}/publish_file.py:{engine}/tk-multi-publish2/basic/movie_publisher.py"
+      Asset Type: StaticMesh
+      Content Path: /Game/Assets/{asset_type}/{asset_name}
+      Export Path Template: unreal_asset_export
+      Publish Template: unreal_asset_publish
+  
+  - name: Render and Publish Movie
+    hook: "{config}/tk-multi-publish2/movie_publisher.py"
     settings:
-      Publish Template: unreal.movie_publish
+      Publish Template: unreal_movie_publish
+  
+  location: "@apps.tk-multi-publish2.location"
 
 settings.tk-multi-publish2.maya.asset_step.unreal:
-  location: "@apps.tk-multi-publish2.location"
-  collector: "{self}/base_collector.py:{engine}/tk-multi-publish2/basic/collector.py:{tk-framework-unrealqt_v1.x.x}/tk-multi-publish2/tk-maya/basic/collector.py"
+  collector: "{config}/tk-multi-publish2/maya_collector.py"
   collector_settings:
-      Work Template: maya_asset_work
+    Work Template: maya_asset_work
   publish_plugins:
-  - name: Publish to ShotGrid
-    hook: "{self}/publish_file.py"
-    settings: {}
-  - name: Upload for review
-    hook: "{self}/upload_version.py"
-    settings: {}
-  - name: Begin file versioning
-    hook: "{engine}/tk-multi-publish2/basic/start_version_control.py"
-    settings: {}
-  - name: Publish to ShotGrid
-    hook: "{self}/publish_file.py:{engine}/tk-multi-publish2/basic/session_publisher.py"
+  - name: Publish Maya Session
+    hook: "{config}/tk-multi-publish2/session_publisher.py"
     settings:
-        Publish Template: maya_asset_publish
-  - name: Publish to ShotGrid
-    hook: "{self}/publish_file.py:{engine}/tk-multi-publish2/basic/publish_session_geometry.py"
+      Publish Type: Maya Session
+      Publish Template: maya_session_publish
+  
+  - name: Export FBX for Unreal
+    hook: "{config}/tk-multi-publish2/maya_fbx_exporter.py:{config}/tk-multi-publish2/maya_fbx_publisher.py"
     settings:
-        Publish Template: asset_alembic_cache
-  - name: Publish FBX to ShotGrid
-    hook: "{self}/publish_file.py:{tk-framework-unrealqt_v1.x.x}/tk-multi-publish2/tk-maya/basic/publish_fbx.py"
+      Export Path Template: maya_fbx_export
+      Publish Template: maya_fbx_publish
+  
+  - name: Render and Publish Movie
+    hook: "{config}/tk-multi-publish2/movie_publisher.py"
     settings:
-        Publish Template: unreal.maya_asset_fbx_publish
-  - name: Publish and Submit for Review
-    hook: "{self}/publish_file.py:{tk-framework-unrealqt_v1.x.x}/tk-multi-publish2/tk-maya/basic/publish_turntable.py"
-    settings:
-        Work Template: unreal.maya_turntable_render
-        Publish Template: unreal.maya_turntable_publish
-        Unreal Engine Version: "5.0"
-        Unreal Project Path Template: "{self}/resources/ueprojects/{unreal_engine_version}/turntable/turntable.uproject"
-        Turntable Map Path: "/Game/turntable/level/turntable.umap"
-        Sequence Path: "/Game/turntable/sequence/turntable_sequence.turntable_sequence"
-        Turntable Assets Path: "/Game/maya_turntable_assets"
-  help_url: *help_url
+      Publish Template: maya_movie_publish
+  
+  location: "@apps.tk-multi-publish2.location"
