@@ -6,9 +6,10 @@ import os
 import maya.cmds as cmds
 import sgtk
 
-HookBaseClass = sgtk.get_hook_baseclass()
+# Import our base plugin
+from .common.base_plugin import BasePublishPlugin
 
-class MayaFBXPublishPlugin(HookBaseClass):
+class MayaFBXPublishPlugin(BasePublishPlugin):
     """
     Plugin for publishing an FBX file from Maya for use in Unreal Engine.
     """
