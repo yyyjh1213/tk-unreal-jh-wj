@@ -79,34 +79,33 @@ class AppLaunch(tank.Hook):
             sys.path.append(packages)
 
         if depart_confirm:
-            adapter = get_adapter(platform.system())
-            packages = get_rez_packages(sg, app_name, version, system, project)
+            # adapter = get_adapter(platform.system())
+            # packages = get_rez_packages(sg, app_name, version, system, project)
 
-            try:
-                import rez as _
-            except ImportError:
-                rez_path = adapter.get_rez_module_root()
-                if not rez_path:
-                    raise EnvironmentError('rez is not installed and could not be automatically found. Cannot continue.')
+            # try:
+            #     import rez as _
+            # except ImportError:
+            #     rez_path = adapter.get_rez_module_root()
+            #     if not rez_path:
+            #         raise EnvironmentError('rez is not installed and could not be automatically found. Cannot continue.')
                 
-                if sys.version_info.major == 3:
-                    rez_path = rez_path.decode('utf-8')
+            #     if sys.version_info.major == 3:
+            #         rez_path = rez_path.decode('utf-8')
                 
-                sys.path.append(rez_path)
+            #     sys.path.append(rez_path)
             
-            from rez import resolved_context
+            # from rez import resolved_context
 
-            if not packages or app_name == 'unreal':
-                if not packages:
-                    self.logger.debug('No rez packages were found. The default boot, instead.')
-                command = adapter.get_command(app_path, app_args)
-                return_code = os.system(command)
-                return {'command': command, 'return_code': return_code}
+            # if not packages or app_name == 'unreal':
+            #     if not packages:
+            #         self.logger.debug('No rez packages were found. The default boot, instead.')
+            #     command = adapter.get_command(app_path, app_args)
+            #     return_code = os.system(command)
+            #     return {'command': command, 'return_code': return_code}
             
-            context = resolved_context.ResolvedContext(packages)
-            return adapter.execute(context, app_args, app_name)
+            # context = resolved_context.ResolvedContext(packages)
+            # return adapter.execute(context, app_args, app_name)
 
-        else:
             if tank.util.is_linux():
                 # on linux, we just run the executable directly
                 cmd = "%s %s &" % (app_path, app_args)
@@ -141,131 +140,58 @@ class AppLaunch(tank.Hook):
             return {"command": cmd, "return_code": exit_code}
 
 
-def get_rez_packages(sg, app_name, version, system, project):
+# def get_rez_packages(sg, app_name, version, system, project):
     
-    if system == 'Linux':
-        filter_dict = [['code','is',app_name.title()+" "+version],
-                       ['projects','in',project]
-                      ]
-        packages = sg.find("Software",filter_dict,['sg_rez'])
-        if packages : 
-            packages =  packages[0]['sg_rez']
-        else:
-            filter_dict = [['code','is',app_name.title()+" "+version],
-                        ['projects','is',None] ]
-            packages = sg.find("Software",filter_dict,['sg_rez'])
-            if packages:
-                packages =  packages[0]['sg_rez']
+#     if system == 'Linux':
+#         filter_dict = [['code','is',app_name.title()+" "+version],
+#                        ['projects','in',project]
+#                       ]
+#         packages = sg.find("Software",filter_dict,['sg_rez'])
+#         if packages : 
+#             packages =  packages[0]['sg_rez']
+#         else:
+#             filter_dict = [['code','is',app_name.title()+" "+version],
+#                         ['projects','is',None] ]
+#             packages = sg.find("Software",filter_dict,['sg_rez'])
+#             if packages:
+#                 packages =  packages[0]['sg_rez']
 
-    else:
-        filter_dict = [['code','is',app_name.title()+" "+version],
-                       ['projects','in',project]
-                      ]
-        packages = sg.find("Software",filter_dict,['sg_win_rez'])
-        if packages : 
-            packages =  packages[0]['sg_win_rez']
-        else:
-            filter_dict = [['code','is',app_name.title()+" "+version],
-                        ['projects','is',None] ]
-            packages = sg.find("Software",filter_dict,['sg_win_rez'])
-            if packages:
-                packages =  packages[0]['sg_win_rez']
+#     else:
+#         filter_dict = [['code','is',app_name.title()+" "+version],
+#                        ['projects','in',project]
+#                       ]
+#         packages = sg.find("Software",filter_dict,['sg_win_rez'])
+#         if packages : 
+#             packages =  packages[0]['sg_win_rez']
+#         else:
+#             filter_dict = [['code','is',app_name.title()+" "+version],
+#                         ['projects','is',None] ]
+#             packages = sg.find("Software",filter_dict,['sg_win_rez'])
+#             if packages:
+#                 packages =  packages[0]['sg_win_rez']
 
-    if packages:
-        packages = [ x for x in packages.split(",")] 
-    else:
-        packages = None
+#     if packages:
+#         packages = [ x for x in packages.split(",")] 
+#     else:
+#         packages = None
         
-    return packages
+#     return packages
 
 
 
-def get_adapter(system=''):
-    if not system:
-        system = platform.system()
+# def get_adapter(system=''):
+#     if not system:
+#         system = platform.system()
     
-    options = {
-        'Linux' : LinuxAdapter,
-        'Windows' : WindowsAdapter
-        }
+#     options = {
+#         'Linux' : LinuxAdapter,
+#         'Windows' : WindowsAdapter
+#         }
 
-    try :
-        return options[system]
+#     try :
+#         return options[system]
 
-    except KeyError:
-        raise NotImplementedError('system "{system}" is currently unsupported. Options were, "{options}"'
-                                  ''.format(system=system, options=list(options)))
-    
-
-class BaseAdapter:
-
-    shell_type = 'bash'
-
-    @staticmethod
-    def get_command(path, args):
-        return 'mate-terminal -x bash -c "{path}" {args} &'.format(path=path, args=args)
-
-    @staticmethod
-    def get_rez_root_command():
-
-        return 'rez-env rez -- printenv REZ_REZ_ROOT'
-
-    @classmethod
-    def get_rez_module_root(cls):
-
-        command = cls.get_rez_root_command()
-        module_path, stderr = subprocess.Popen(
-            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()
-
-        module_path = module_path.strip()
-
-        if not stderr and module_path:
-            return module_path
-
-        return ''
-
-    @classmethod
-    def execute(cls, context, args, command):
-
-        os.environ['USE_SHOTGUN'] = "OK"
-
-        if args:
-            command += ' {args}'.format(args=args)
-        
-        if platform.system() == 'Linux':
-            command = "mate-terminal -x bash -c '{}' &".format(command)
-        else:
-            command = "start /B 'App' '{}'".format(command)
-
-        context.execute_shell(
-            command = command,
-            stdin = False,
-            block = False
-        )
-
-        return_code = 0
-        context.print_info(verbosity=True)
-
-        return {
-            'command': command,
-            'return_code': return_code,
-        }
-
-
-class LinuxAdapter(BaseAdapter):
-
-    pass
-
-
-class WindowsAdapter(BaseAdapter):
-
-    shell_type = 'cmd'
-
-    @staticmethod
-    def get_command(path, args):
-        return 'start /B "App" "{path}" {args}'.format(path=path, args=args)
-
-    @staticmethod
-    def get_rez_root_command():
-
-        return 'rez-env rez -- echo %REZ_REZ_ROOT%'
+#     except KeyError:
+#         raise NotImplementedError('system "{system}" is currently unsupported. Options were, "{options}"'
+#                                   ''.format(system=system, options=list(options)))
+{{ ... }}
