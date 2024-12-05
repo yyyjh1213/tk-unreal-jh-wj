@@ -66,6 +66,13 @@ class AppLaunch(tank.Hook):
         user = context.user
         depart = sg.find_one("Department", [['users', 'in', user]], ['name'])
 
+        # Check department permissions
+        depart_confirm = False
+        if (depart['name'] == 'RND' and engine_name == 'tk-nuke') or \
+           (depart['name'] in ['General']) or \
+           (engine_name == 'tk-unreal'):  # Allow Unreal Engine for all departments
+            depart_confirm = True
+
         # Handle UE special case for Python 3
         if sys.version_info.major == 3 and app_name == 'unreal' and system == 'Windows':
             now_dir = os.path.dirname(os.path.abspath(__file__))
@@ -73,6 +80,9 @@ class AppLaunch(tank.Hook):
             sys.path.append(packages)
 
         # Default launch logic
+        if not depart_confirm:
+            return {"command": "", "return_code": 1}
+
         if tank.util.is_linux():
             cmd = "%s %s &" % (app_path, app_args)
 
