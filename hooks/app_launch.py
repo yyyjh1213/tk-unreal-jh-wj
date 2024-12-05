@@ -79,6 +79,15 @@ class AppLaunch(tank.Hook):
             packages = os.path.join(now_dir, 'packages', 'win')
             sys.path.append(packages)
 
+            # Special handling for Unreal Engine
+            if app_name == 'unreal':
+                if app_args:
+                    cmd = '"%s" %s' % (app_path, app_args)
+                else:
+                    cmd = '"%s"' % app_path
+                exit_code = os.system(cmd)
+                return {"command": cmd, "return_code": exit_code}
+
         # Default launch logic
         if not depart_confirm:
             return {"command": "", "return_code": 1}
