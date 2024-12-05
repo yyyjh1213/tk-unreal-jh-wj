@@ -14,6 +14,13 @@ class MayaFBXPublishPlugin(HookBaseClass):
     """
 
     @property
+    def name(self):
+        """
+        One line display name describing the plugin
+        """
+        return "Publish Maya FBX"
+
+    @property
     def description(self):
         """
         Verbose, multi-line description of what the plugin does.
@@ -27,8 +34,6 @@ class MayaFBXPublishPlugin(HookBaseClass):
     def settings(self):
         """
         Dictionary defining the settings that this plugin expects to receive
-        through the settings parameter in the accept, validate, publish and
-        finalize methods.
         """
         return {
             "Publish Template": {
@@ -39,18 +44,39 @@ class MayaFBXPublishPlugin(HookBaseClass):
             }
         }
 
+    @property
+    def item_filters(self):
+        """
+        List of item types that this plugin is interested in.
+        """
+        return ["maya.fbx"]
+
     def accept(self, settings, item):
         """
         Method called by the publisher to determine if an item is of any
         interest to this plugin. Only items matching the filters defined via the
         item_filters property will be presented to this method.
         """
+        if "meshes" not in item.properties:
+            self.logger.warning("메시 정보를 찾을 수 없습니다!")
+            return False
+
+        if not item.properties["meshes"]:
+            self.logger.warning("씬에 메시가 없습니다!")
+            return False
+
         return True
 
     def validate(self, settings, item):
         """
         Validates the given item to check that it is ok to publish.
         """
+        path = self._get_publish_path(settings, item)
+        
+        if not path:
+            self.logger.error("퍼블리시 경로를 생성할 수 없습니다!")
+            return False
+
         return True
 
     def publish(self, settings, item):
@@ -60,34 +86,75 @@ class MayaFBXPublishPlugin(HookBaseClass):
         publisher = self.parent
         engine = sgtk.platform.current_engine()
 
-        # Get the path in a normalized state. No trailing separator, separators
-        # are appropriate for current os, no double separators, etc.
-        path = sgtk.util.ShotgunPath.normalize(item.properties["path"])
+        # Get the publish path
+        publish_path = self._get_publish_path(settings, item)
 
         # Ensure the publish folder exists
-        publish_folder = os.path.dirname(path)
+        publish_folder = os.path.dirname(publish_path)
         self.parent.ensure_folder_exists(publish_folder)
 
         try:
             # Export the FBX file
-            self._export_fbx(path)
+            self._export_fbx(item.properties["meshes"], publish_path)
+            self.logger.info("FBX 파일이 성공적으로 내보내졌습니다: %s" % publish_path)
         except Exception as e:
-            self.logger.error("Failed to export FBX file: %s" % e)
+            self.logger.error("FBX 파일 내보내기 실패: %s" % e)
             return False
 
         return True
 
     def finalize(self, settings, item):
         """
-        Execute the finalization pass. This pass executes once
-        all the publish tasks have completed, and can for example
-        be used to version up files.
+        Execute the finalization pass.
         """
         pass
 
-    def _export_fbx(self, path):
+    def _get_publish_path(self, settings, item):
         """
-        Export the current Maya scene as an FBX file.
+        Get the publish path for the FBX file.
         """
-        # Your FBX export code here
-        pass
+        publisher = self.parent
+
+        # Get the template path from the settings
+        template_name = settings["Publish Template"].value
+        if not template_name:
+            self.logger.error("퍼블리시 템플릿이 설정되지 않았습니다!")
+            return None
+
+        # Get template from the engine
+        template = publisher.get_template_by_name(template_name)
+        if not template:
+            self.logger.error("템플릿을 찾을 수 없습니다: %s" % template_name)
+            return None
+
+        # Get fields from the context
+        fields = item.context.as_template_fields(template)
+        
+        # Get additional fields from item properties
+        fields["name"] = item.properties.get("publish_name", "")
+        fields["version"] = publisher.util.get_next_version_number(item.context, template, fields)
+
+        # Apply fields to template to get publish path
+        return template.apply_fields(fields)
+
+    def _export_fbx(self, meshes, path):
+        """
+        Export the meshes as an FBX file.
+        """
+        # Select the meshes for export
+        cmds.select(meshes, replace=True)
+
+        # Set up FBX export options
+        kwargs = {
+            "file": path,
+            "force": True,
+            "options": True,
+            "type": "FBX export",
+            "preserveReferences": True,
+            "shader": True,
+            "smoothing": True,
+            "triangulate": True
+        }
+
+        # Export the file
+        cmds.file(**kwargs)
