@@ -83,7 +83,7 @@ settings.tk-multi-publish2.unreal.asset:
   location: "@apps.tk-multi-publish2.location"
 
 settings.tk-multi-publish2.maya.asset_step.unreal:
-  collector: "{config}/tk-multi-publish2/maya_collector.py"
+  collector: "{config}/tk-multi-publish2/collector_maya.py"
   collector_settings:
     Work Template: maya_asset_work
   publish_plugins:
