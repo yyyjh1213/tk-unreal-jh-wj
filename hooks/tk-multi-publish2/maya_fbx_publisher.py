@@ -3,11 +3,17 @@
 # file included in this repository.
 
 import os
+import sys
 import maya.cmds as cmds
 import sgtk
 
-# Import our base plugin
-from .common.base_plugin import BasePublishPlugin
+# Add the common directory to the Python path
+COMMON_DIR = os.path.join(os.path.dirname(__file__), "common")
+if COMMON_DIR not in sys.path:
+    sys.path.append(COMMON_DIR)
+
+# Import our base plugin using absolute import
+from base_plugin import BasePublishPlugin
 
 class MayaFBXPublishPlugin(BasePublishPlugin):
     """
