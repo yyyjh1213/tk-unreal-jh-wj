@@ -30,5 +30,6 @@ settings.tk-unreal.project:
   menu_favourites: []
   run_at_startup:
   - {app_instance: tk-multi-shotgunpanel, name: ''}
-  launch_builtin_plugins: [basic]
-  automatic_context_switch: false
+  - {app_instance: tk-multi-publish2, name: ''}
+  launch_builtin_plugins: [basic, shotgrid]
+  automatic_context_switch: true
