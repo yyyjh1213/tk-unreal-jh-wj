@@ -5,10 +5,9 @@
 import os
 import maya.cmds as cmds
 import sgtk
+from .base_hooks.publish_plugin import PublishPlugin
 
-HookBaseClass = sgtk.get_hook_baseclass()
-
-class MayaFBXPublishPlugin(HookBaseClass):
+class MayaFBXPublishPlugin(PublishPlugin):
     """
     Plugin for publishing an FBX file from Maya for use in Unreal Engine.
     """
@@ -59,13 +58,13 @@ class MayaFBXPublishPlugin(HookBaseClass):
         """
         if "meshes" not in item.properties:
             self.logger.warning("메시 정보를 찾을 수 없습니다!")
-            return False
+            return {"accepted": False}
 
         if not item.properties["meshes"]:
             self.logger.warning("씬에 메시가 없습니다!")
-            return False
+            return {"accepted": False}
 
-        return True
+        return {"accepted": True}
 
     def validate(self, settings, item):
         """
