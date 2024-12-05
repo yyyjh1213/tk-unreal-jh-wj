@@ -68,10 +68,15 @@ class AppLaunch(tank.Hook):
 
         # Check department permissions
         depart_confirm = False
-        if (depart['name'] == 'RND' and engine_name == 'tk-nuke') or \
-           (depart['name'] in ['General']) or \
-           (engine_name == 'tk-unreal'):  # Allow Unreal Engine for all departments
-            depart_confirm = True
+        if depart and depart.get('name'):  
+            if (depart['name'] == 'RND' and engine_name == 'tk-nuke') or \
+               (depart['name'] in ['General']) or \
+               (engine_name == 'tk-unreal'):  
+                depart_confirm = True
+        else:
+            # Department 정보가 없는 경우 Unreal Engine은 허용
+            if engine_name == 'tk-unreal':
+                depart_confirm = True
 
         # Handle UE special case for Python 3
         if sys.version_info.major == 3 and app_name == 'unreal' and system == 'Windows':
