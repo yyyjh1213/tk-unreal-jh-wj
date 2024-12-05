@@ -212,57 +212,58 @@ class UnrealActions(HookBaseClass):
         :param sg_publish_data: Shotgun data dictionary with all the standard publish fields.
         :return destination_path that matches a template and destination_name from asset or published file
         """
-        # Enable if needed while in development
-        # self.sgtk.reload_templates()
-
-        # Get the publish context to determine the template to use
+        # Get the publish context
         context = self.sgtk.context_from_entity_dictionary(sg_publish_data)
 
         # Get the destination templates based on the context
-        # Assets and Shots supported by default
-        # Other entities fall back to Project
-        if context.entity is None:
+        if context.entity is None or context.entity["type"] != "Asset":
             destination_template = self.sgtk.templates["unreal_loader_project_path"]
             destination_name_template = self.sgtk.templates["unreal_loader_project_name"]
-        elif context.entity["type"] == "Asset":
+        else:
             destination_template = self.sgtk.templates["unreal_loader_asset_path"]
             destination_name_template = self.sgtk.templates["unreal_loader_asset_name"]
-        elif context.entity["type"] == "Shot":
-            destination_template = self.sgtk.templates["unreal_loader_shot_path"]
-            destination_name_template = self.sgtk.templates["unreal_loader_shot_name"]
-        else:
-            destination_template = self.sgtk.templates["unreal_loader_project_path"]
-            destination_name_template = self.sgtk.templates["unreal_loader_project_name"]
 
-        # Get the name field from the Publish Data
-        name = sg_publish_data["name"]
-        name = os.path.splitext(name)[0]
+        # Initialize fields dictionary
+        fields = {}
+        
+        # Get project info
+        if context.project:
+            fields["project"] = context.project["name"]
 
-        # Query the fields needed for the destination template from the context
-        fields = context.as_template_fields(destination_template)
+        # Get asset info from entity
+        if context.entity and context.entity["type"] == "Asset":
+            entity = context.entity
+            
+            # Get asset type
+            if "sg_asset_type" in entity:
+                fields["asset_type"] = entity["sg_asset_type"]
+            
+            # Get asset name
+            if "code" in entity:
+                fields["asset_name"] = entity["code"]
+        
+        # Get step info from task
+        if context.task:
+            step = context.task["step"]
+            if step and "short_name" in step:
+                fields["step"] = step["short_name"]
 
-        # Add the name field from the publish data
-        fields["name"] = name
-
-        # Get destination path by applying fields to destination template
-        # Fall back to the root level if unsuccessful
+        # Get destination path
         try:
             destination_path = destination_template.apply_fields(fields)
-        except Exception:
+        except Exception as e:
+            self.logger.warning(f"Error applying fields to path template: {e}")
             destination_path = "/Game/Assets/"
 
-        # Query the fields needed for the name template from the context
-        name_fields = context.as_template_fields(destination_name_template)
-
-        # Add the name field from the publish data
-        name_fields["name"] = name
-
-        # Get destination name by applying fields to the name template
-        # Fall back to the filename if unsuccessful
+        # Get destination name
         try:
-            destination_name = destination_name_template.apply_fields(name_fields)
-        except Exception:
-            destination_name = _sanitize_name(sg_publish_data["code"])
+            destination_name = destination_name_template.apply_fields(fields)
+        except Exception as e:
+            self.logger.warning(f"Error applying fields to name template: {e}")
+            if "asset_name" in fields:
+                destination_name = self._sanitize_name(fields["asset_name"])
+            else:
+                destination_name = self._sanitize_name(sg_publish_data.get("code", ""))
 
         return destination_path, destination_name
 
