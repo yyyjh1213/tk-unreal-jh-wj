@@ -18,42 +18,35 @@ HookBaseClass = sgtk.get_hook_baseclass()
 
 class PostPhase(HookBaseClass):
     """
-    퍼블리시 단계 이후에 실행되는 후처리 훅입니다.
-    각 퍼블리시 단계(검증, 퍼블리시, 마무리)가 완료된 후 실행되는 메서드들을 정의합니다.
-
-    작동 원리:
-    1. 퍼블리시 트리를 통해 모든 퍼블리시된 아이템에 접근
-    2. 각 아이템의 상태를 검사하고 필요한 후처리 작업 수행
-    3. 퍼블리시 결과에 따른 추가 작업 실행 (예: 알림, 로그 기록 등)
-    """
-
-    """
-    퍼블리시의 각 단계 이후에 실행되는 메서드들을 정의하는 훅 클래스입니다.
-    
-    주요 기능:
-    - 검증 단계 이후 처리 (post_validate)
-    - 퍼블리시 단계 이후 처리 (post_publish)
-    - 마무리 단계 이후 처리 (post_finalize)
-    
-    각 메서드는 PublishTree 인스턴스를 받아 퍼블리시된 아이템들을 처리할 수 있습니다.
+    This hook defines methods that are executed after each phase of a publish: validation, publish, and finalization.
+    Each method receives the PublishTree tree instance being used by the publisher,
+    giving full control to further curate the publish tree including the publish items and the tasks attached to them.
+    See the PublishTree documentation for additional details on how to traverse the tree and manipulate it.
     """
 
     def post_publish(self, publish_tree):
         """
-        퍼블리시 단계가 완료된 후, 마무리 단계 전에 실행되는 메서드입니다.
-        
-        작동 과정:
-        1. 퍼블리시 트리의 모든 아이템을 순회
-        2. 각 아이템의 properties를 검사하여 퍼블리시 상태 확인
-        3. 필요한 후처리 작업 수행
-        
-        참고: local_properties는 퍼블리시 플러그인 실행 중에만 접근 가능합니다.
+        This method is executed after the publish pass has completed for each
+        item in the tree, before the finalize pass.
+
+        A :ref:`publish-api-tree` instance representing the items that were
+        published is supplied as an argument. The tree can be traversed in this
+        method to inspect the items and process them collectively.
+
+        To glean information about the publish state of particular items, you
+        can iterate over the items in the tree and introspect their
+        :py:attr:`~.api.PublishItem.properties` dictionary. This requires
+        customizing your publish plugins to populate any specific publish
+        information that you want to process collectively here.
+
+        .. warning:: You will not be able to use the item's
+            :py:attr:`~.api.PublishItem.local_properties` in this hook since
+            :py:attr:`~.api.PublishItem.local_properties` are only accessible
+            during the execution of a publish plugin.
+
+        :param publish_tree: The :ref:`publish-api-tree` instance representing
+            the items to be published.
         """
-        
-        # Iterate through all items in the publish tree
-        for item in publish_tree:
-            if item.type == "maya.fbx.unreal":
-                self._export_maya_fbx(item)
 
         # ------------------------------------------------------------------------
         # Manage background publishing process
@@ -149,115 +142,31 @@ class PostPhase(HookBaseClass):
 
         # ------------------------------------------------------------------------
 
-    def _export_maya_fbx(self, item):
-        """
-        Export Maya scene as FBX with Unreal-optimized settings
-        """
-        import maya.cmds as cmds
-        import maya.mel as mel
-
-        # Get the path
-        path = item.properties.get("path", "")
-        if not path:
-            self.logger.error("No path found for item")
-            return False
-
-        # Ensure the publish folder exists
-        publish_folder = os.path.dirname(path)
-        self.parent.ensure_folder_exists(publish_folder)
-
-        # Prepare FBX export options
-        mel.eval('FBXResetExport')
-        
-        # Set up axis conversion and scale
-        mel.eval('FBXExportUpAxis y')
-        mel.eval('FBXExportScaleFactor 1')
-        
-        # Configure FBX version
-        mel.eval('FBXExportFileVersion FBX201900')
-        
-        # Configure geometry export options
-        mel.eval('FBXExportSmoothingGroups -v 1')
-        mel.eval('FBXExportHardEdges -v 0')
-        mel.eval('FBXExportTangents -v 1')
-        mel.eval('FBXExportSmoothMesh -v 1')
-        mel.eval('FBXExportInstances -v 0')
-        mel.eval('FBXExportTriangulate -v 1')
-        
-        # Configure animation and deformation options
-        mel.eval('FBXExportAnimationOnly -v 0')
-        mel.eval('FBXExportBakeComplexAnimation -v 1')
-        mel.eval('FBXExportBakeComplexStart -v 0')
-        mel.eval('FBXExportBakeComplexEnd -v 100')
-        mel.eval('FBXExportBakeComplexStep -v 1')
-        
-        # Configure includes
-        mel.eval('FBXExportInAscii -v 0')
-        mel.eval('FBXExportLights -v 1')
-        mel.eval('FBXExportCameras -v 1')
-        mel.eval('FBXExportConstraints -v 1')
-        mel.eval('FBXExportSkeletonDefinitions -v 1')
-        
-        # Configure materials and textures
-        mel.eval('FBXExportMaterials -v 1')
-        mel.eval('FBXExportTextures -v 1')
-        mel.eval('FBXExportEmbeddedTextures -v 0')
-        
-        try:
-            # Get selection state
-            selection = cmds.ls(selection=True)
-            if selection:
-                mel.eval(f'FBXExport -f "{path}" -s')
-            else:
-                mel.eval(f'FBXExport -f "{path}"')
-            
-            self.logger.info(f"FBX exported successfully to: {path}")
-            
-            # Register the published file
-            self._register_publish(item, path)
-            
-            return True
-            
-        except Exception as e:
-            self.logger.error(f"Failed to export FBX: {str(e)}")
-            return False
-
-    def _register_publish(self, item, path):
-        """
-        Register the published file with Shotgun.
-        """
-        publisher = self.parent
-        
-        # Get the publish info
-        publish_version = publisher.util.get_version_number(path)
-        publish_name = publisher.util.get_publish_name(path)
-        
-        # Create the publish
-        publish_data = {
-            "tk": publisher.sgtk,
-            "context": item.context,
-            "comment": item.description,
-            "path": path,
-            "name": publish_name,
-            "version_number": publish_version,
-            "published_file_type": "FBX File",
-        }
-        
-        # Register the publish
-        publisher.util.register_publish(**publish_data)
-
     def post_finalize(self, publish_tree):
         """
-        퍼블리시 단계가 완료된 후, 마무리 단계 전에 실행되는 메서드입니다.
-        
-        작동 과정:
-        1. 퍼블리시 트리의 모든 아이템을 순회
-        2. 각 아이템의 properties를 검사하여 퍼블리시 상태 확인
-        3. 필요한 후처리 작업 수행
-        
-        참고: local_properties는 퍼블리시 플러그인 실행 중에만 접근 가능합니다.
+        This method is executed after the finalize pass has completed for each
+        item in the tree.
+
+        A :ref:`publish-api-tree` instance representing the items that were
+        published and finalized is supplied as an argument. The tree can be
+        traversed in this method to inspect the items and process them
+        collectively.
+
+        To glean information about the finalize state of particular items, you
+        can iterate over the items in the tree and introspect their
+        :py:attr:`~.api.PublishItem.properties` dictionary. This requires
+        customizing your publish plugins to populate any specific finalize
+        information that you want to process collectively here.
+
+        .. warning:: You will not be able to use the item's
+            :py:attr:`~.api.PublishItem.local_properties` in this hook since
+            :py:attr:`~.api.PublishItem.local_properties` are only accessible
+            during the execution of a publish plugin.
+
+        :param publish_tree: The :ref:`publish-api-tree` instance representing
+            the items to be published.
         """
-        
+
         bg_processing = publish_tree.root_item.properties.get("bg_processing")
         in_bg_process = publish_tree.root_item.properties.get("in_bg_process")
 

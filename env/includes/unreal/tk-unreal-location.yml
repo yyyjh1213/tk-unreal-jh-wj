@@ -3,16 +3,9 @@
 # file included in this repository.
 
 
-#공식버전
+
 tk-unreal.location:
   version: v1.3.1
   type: github_release
   organization: ue4plugins
   repository: tk-unreal
-
-#인턴버전으로 추가?
-
-#SG 스토리지 정의
-location: C:/show/test_unreal
-type: dev
-name: test_unreal

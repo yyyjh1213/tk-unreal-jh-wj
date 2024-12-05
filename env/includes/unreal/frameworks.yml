@@ -5,8 +5,8 @@
  # unrealqt - PySide build for Unreal
 frameworks:
     tk-framework-unrealqt_v1.x.x:
-        location:
-            type: github_release
-            organization: ue4plugins
-            repository: tk-framework-unrealqt
-            version: v1.3.1
+      location:
+        version: v1.3.1
+        type: github_release
+        organization: ue4plugins
+        repository: tk-framework-unrealqt

@@ -23,7 +23,7 @@ publish_help_url: &help_url "https://help.autodesk.com/view/SGSUB/ENU/?guid=SG_S
 # ---- Stand alone publish
 
 settings.tk-multi-publish2.standalone:
-  collector: "{self}/base_collector.py"
+  collector: "{self}/collector.py"
   publish_plugins:
   - name: Publish to Flow Production Tracking
     hook: "{self}/publish_file.py"
@@ -40,7 +40,7 @@ settings.tk-multi-publish2.standalone:
 
 # asset step
 settings.tk-multi-publish2.3dsmax.asset_step:
-  collector: "{self}/base_collector.py:{engine}/tk-multi-publish2/basic/collector.py"
+  collector: "{self}/collector.py:{engine}/tk-multi-publish2/basic/collector.py"
   collector_settings:
       Work Template: max_asset_work
   publish_plugins:
@@ -66,7 +66,7 @@ settings.tk-multi-publish2.3dsmax.asset_step:
 
 # shot step
 settings.tk-multi-publish2.3dsmax.shot_step:
-  collector: "{self}/base_collector.py:{engine}/tk-multi-publish2/basic/collector.py"
+  collector: "{self}/collector.py:{engine}/tk-multi-publish2/basic/collector.py"
   collector_settings:
       Work Template: max_shot_work
   publish_plugins:
@@ -92,7 +92,7 @@ settings.tk-multi-publish2.3dsmax.shot_step:
 
 # asset step
 settings.tk-multi-publish2.houdini.asset_step:
-  collector: "{self}/base_collector.py:{engine}/tk-multi-publish2/basic/collector.py"
+  collector: "{self}/collector.py:{engine}/tk-multi-publish2/basic/collector.py"
   collector_settings:
       Work Template: houdini_asset_work
   publish_plugins:
@@ -114,7 +114,7 @@ settings.tk-multi-publish2.houdini.asset_step:
 
 # shot step
 settings.tk-multi-publish2.houdini.shot_step:
-  collector: "{self}/base_collector.py:{engine}/tk-multi-publish2/basic/collector.py"
+  collector: "{self}/collector.py:{engine}/tk-multi-publish2/basic/collector.py"
   collector_settings:
       Work Template: houdini_shot_work
   publish_plugins:
@@ -140,7 +140,7 @@ settings.tk-multi-publish2.houdini.shot_step:
 
 # asset_step
 settings.tk-multi-publish2.mari.asset_step:
-  collector: "{self}/base_collector.py:{engine}/tk-multi-publish2/basic/collector.py"
+  collector: "{self}/collector.py:{engine}/tk-multi-publish2/basic/collector.py"
   publish_plugins:
   - name: Publish to Flow Production Tracking
     hook: "{self}/publish_file.py"
@@ -161,7 +161,9 @@ settings.tk-multi-publish2.mari.asset_step:
 
 # asset step
 settings.tk-multi-publish2.maya.asset_step:
-  collector: "{self}/base_collector.py:{config}/tk-multi-publish2/collector_maya.py"
+  collector: "{self}/collector.py:{engine}/tk-multi-publish2/basic/collector.py"
+  collector_settings:
+      Work Template: maya_asset_work
   publish_plugins:
   - name: Publish to Flow Production Tracking
     hook: "{self}/publish_file.py"
@@ -172,16 +174,22 @@ settings.tk-multi-publish2.maya.asset_step:
   - name: Begin file versioning
     hook: "{engine}/tk-multi-publish2/basic/start_version_control.py"
     settings: {}
-  - name: Publish Maya Session
+  - name: Publish to Flow Production Tracking
     hook: "{self}/publish_file.py:{engine}/tk-multi-publish2/basic/publish_session.py"
     settings:
         Publish Template: maya_asset_publish
+  - name: Publish to Flow Production Tracking
+    hook: "{self}/publish_file.py:{engine}/tk-multi-publish2/basic/publish_session_geometry.py"
+    settings:
+        Publish Template: asset_alembic_cache
   help_url: *help_url
   location: "@apps.tk-multi-publish2.location"
 
 # shot step
 settings.tk-multi-publish2.maya.shot_step:
-  collector: "{self}/base_collector.py:{config}/tk-multi-publish2/collector_maya.py"
+  collector: "{self}/collector.py:{engine}/tk-multi-publish2/basic/collector.py"
+  collector_settings:
+      Work Template: maya_shot_work
   publish_plugins:
   - name: Publish to Flow Production Tracking
     hook: "{self}/publish_file.py"
@@ -192,7 +200,7 @@ settings.tk-multi-publish2.maya.shot_step:
   - name: Begin file versioning
     hook: "{engine}/tk-multi-publish2/basic/start_version_control.py"
     settings: {}
-  - name: Publish Maya Session
+  - name: Publish to Flow Production Tracking
     hook: "{self}/publish_file.py:{engine}/tk-multi-publish2/basic/publish_session.py"
     settings:
         Publish Template: maya_shot_publish
@@ -205,7 +213,7 @@ settings.tk-multi-publish2.maya.shot_step:
 
 # asset step
 settings.tk-multi-publish2.nuke.asset_step:
-  collector: "{self}/base_collector.py:{engine}/tk-multi-publish2/basic/collector.py"
+  collector: "{self}/collector.py:{engine}/tk-multi-publish2/basic/collector.py"
   collector_settings:
       Work Template: nuke_asset_work
   publish_plugins:
@@ -230,7 +238,7 @@ settings.tk-multi-publish2.nuke.asset_step:
 
 # shot step
 settings.tk-multi-publish2.nuke.shot_step:
-  collector: "{self}/base_collector.py:{engine}/tk-multi-publish2/basic/collector.py"
+  collector: "{self}/collector.py:{engine}/tk-multi-publish2/basic/collector.py"
   collector_settings:
       Work Template: nuke_shot_work
   publish_plugins:
@@ -262,7 +270,7 @@ settings.tk-multi-publish2.nuke.shot_step:
 # ---- NukeStudio
 
 settings.tk-multi-publish2.nukestudio:
-  collector: "{self}/base_collector.py:{engine}/tk-multi-publish2/basic/collector.py"
+  collector: "{self}/collector.py:{engine}/tk-multi-publish2/basic/collector.py"
   collector_settings:
       Work Template: hiero_project_work
   publish_plugins:
@@ -288,7 +296,7 @@ settings.tk-multi-publish2.nukestudio:
 
 # asset step
 settings.tk-multi-publish2.photoshop.asset_step:
-  collector: "{self}/base_collector.py:{engine}/tk-multi-publish2/basic/collector.py"
+  collector: "{self}/collector.py:{engine}/tk-multi-publish2/basic/collector.py"
   collector_settings:
       Work Template: photoshop_asset_work
   publish_plugins:
@@ -328,7 +336,7 @@ settings.tk-multi-publish2.photoshop.asset_step:
 
 # shot_step
 settings.tk-multi-publish2.photoshop.shot_step:
-  collector: "{self}/base_collector.py:{engine}/tk-multi-publish2/basic/collector.py"
+  collector: "{self}/collector.py:{engine}/tk-multi-publish2/basic/collector.py"
   collector_settings:
       Work Template: photoshop_shot_work
   publish_plugins:
@@ -372,7 +380,7 @@ settings.tk-multi-publish2.photoshop.shot_step:
 
 # asset step
 settings.tk-multi-publish2.aftereffects.asset_step:
-  collector: "{self}/base_collector.py:{engine}/tk-multi-publish2/basic/collector.py"
+  collector: "{self}/collector.py:{engine}/tk-multi-publish2/basic/collector.py"
   collector_settings:
       Work Template: aftereffects_asset_work
   publish_plugins:
@@ -411,7 +419,7 @@ settings.tk-multi-publish2.aftereffects.asset_step:
 
 # shot_step
 settings.tk-multi-publish2.aftereffects.shot_step:
-  collector: "{self}/base_collector.py:{engine}/tk-multi-publish2/basic/collector.py"
+  collector: "{self}/collector.py:{engine}/tk-multi-publish2/basic/collector.py"
   collector_settings:
       Work Template: aftereffects_shot_work
   publish_plugins:
@@ -451,7 +459,7 @@ settings.tk-multi-publish2.aftereffects.shot_step:
 
 # asset_step
 settings.tk-multi-publish2.motion_builder.asset_step:
-  collector: "{self}/base_collector.py:{engine}/tk-multi-publish2/basic/collector.py"
+  collector: "{self}/collector.py:{engine}/tk-multi-publish2/basic/collector.py"
   collector_settings:
       Work Template: mobu_asset_work
   publish_plugins:
@@ -473,7 +481,7 @@ settings.tk-multi-publish2.motion_builder.asset_step:
 
 # shot_step
 settings.tk-multi-publish2.motion_builder.shot_step:
-  collector: "{self}/base_collector.py:{engine}/tk-multi-publish2/basic/collector.py"
+  collector: "{self}/collector.py:{engine}/tk-multi-publish2/basic/collector.py"
   collector_settings:
       Work Template: mobu_shot_work
   publish_plugins:
@@ -499,7 +507,7 @@ settings.tk-multi-publish2.motion_builder.shot_step:
 
 # asset_step
 settings.tk-multi-publish2.alias.asset_step:
-  collector: "{self}/base_collector.py:{engine}/tk-multi-publish2/basic/collector.py"
+  collector: "{self}/collector.py:{engine}/tk-multi-publish2/basic/collector.py"
   collector_settings:
       Work Template: alias_asset_work
       Background Processing: True
@@ -547,7 +555,7 @@ settings.tk-multi-publish2.alias.asset_step:
 
 # asset_step
 settings.tk-multi-publish2.vred.asset_step:
-  collector: "{self}/base_collector.py:{engine}/tk-multi-publish2/basic/collector.py"
+  collector: "{self}/collector.py:{engine}/tk-multi-publish2/basic/collector.py"
   collector_settings:
       Work Template: vred_asset_work
       Background Processing: True
