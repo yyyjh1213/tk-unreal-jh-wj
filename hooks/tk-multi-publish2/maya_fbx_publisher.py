@@ -5,7 +5,14 @@
 import os
 import maya.cmds as cmds
 import sgtk
-from .base_hooks.publish_plugin import PublishPlugin
+import sys
+
+# Add base hooks directory to Python path
+base_hooks_dir = os.path.join(os.path.dirname(__file__), "base_hooks")
+if base_hooks_dir not in sys.path:
+    sys.path.append(base_hooks_dir)
+
+from publish_plugin import PublishPlugin
 
 class MayaFBXPublishPlugin(PublishPlugin):
     """
