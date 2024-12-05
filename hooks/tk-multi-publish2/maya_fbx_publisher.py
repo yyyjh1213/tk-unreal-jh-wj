@@ -13,9 +13,9 @@ if COMMON_DIR not in sys.path:
     sys.path.append(COMMON_DIR)
 
 # Import our base plugin using absolute import
-from base_plugin import BasePublishPlugin
+from base_hooks.publish_plugin import PublishPlugin
 
-class MayaFBXPublishPlugin(BasePublishPlugin):
+class MayaFBXPublishPlugin(PublishPlugin):
     """
     Plugin for publishing an FBX file from Maya for use in Unreal Engine.
     """
