@@ -5,16 +5,10 @@
 import os
 import maya.cmds as cmds
 import sgtk
-import sys
 
-# Add base hooks directory to Python path
-base_hooks_dir = os.path.join(os.path.dirname(__file__), "base_hooks")
-if base_hooks_dir not in sys.path:
-    sys.path.append(base_hooks_dir)
+HookBaseClass = sgtk.get_hook_baseclass()
 
-from publish_plugin import PublishPlugin
-
-class MayaFBXPublishPlugin(PublishPlugin):
+class MayaFBXPublishPlugin(HookBaseClass):
     """
     Plugin for publishing an FBX file from Maya for use in Unreal Engine.
     """
