@@ -6,8 +6,9 @@ import os
 import maya.cmds as cmds
 import maya.mel as mel
 import sgtk
+from . import base_exporter
 
-HookBaseClass = sgtk.get_hook_baseclass()
+HookBaseClass = base_exporter.BaseExporterPlugin
 
 class MayaFBXExporter(HookBaseClass):
     """
