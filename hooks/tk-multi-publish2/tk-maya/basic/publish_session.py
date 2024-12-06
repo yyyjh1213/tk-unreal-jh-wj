@@ -50,10 +50,31 @@ class MayaUnrealSessionPublishPlugin(HookBaseClass):
     def accept(self, settings, item):
         """
         Method called by the publisher to determine if an item is of any
-        interest to this plugin. Only items matching the filters defined via the
-        item_filters property will be presented to this method.
+        interest to this plugin.
+        
+        :param settings: Dictionary of Settings. The keys are strings, matching
+            the keys returned in the settings property. The values are `Setting`
+            instances.
+        :param item: Item to process
+        :returns: dictionary with the following keys:
+            - accepted (bool): Indicates if the plugin is interested in this value
+            - enabled (bool): If True, the plugin will be enabled in the UI,
+                otherwise it will be disabled. Optional, True by default.
+            - checked (bool): If True, the plugin will be checked in the UI,
+                otherwise it will be unchecked. Optional, True by default.
         """
-        return True
+        if item.type == "maya.session":
+            return {
+                "accepted": True,
+                "enabled": True,
+                "checked": True
+            }
+            
+        return {
+            "accepted": False,
+            "enabled": False,
+            "checked": False
+        }
 
     def validate(self, settings, item):
         """

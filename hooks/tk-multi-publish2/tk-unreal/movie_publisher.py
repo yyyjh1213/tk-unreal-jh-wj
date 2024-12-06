@@ -22,11 +22,30 @@ class MoviePublisher(HookBaseClass):
         """
         Method called by the publisher to determine if an item is of any
         interest to this plugin.
+        
+        :param settings: Dictionary of Settings. The keys are strings, matching
+            the keys returned in the settings property. The values are `Setting`
+            instances.
+        :param item: Item to process
+        :returns: dictionary with the following keys:
+            - accepted (bool): Indicates if the plugin is interested in this value
+            - enabled (bool): If True, the plugin will be enabled in the UI,
+                otherwise it will be disabled. Optional, True by default.
+            - checked (bool): If True, the plugin will be checked in the UI,
+                otherwise it will be unchecked. Optional, True by default.
         """
         if item.type == "unreal.movie":
-            return True
+            return {
+                "accepted": True,
+                "enabled": True,
+                "checked": True
+            }
             
-        return False
+        return {
+            "accepted": False,
+            "enabled": False,
+            "checked": False
+        }
 
     def validate(self, settings, item):
         """
