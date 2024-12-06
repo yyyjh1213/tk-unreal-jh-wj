@@ -10,3 +10,4 @@ frameworks:
         type: github_release
         organization: ue4plugins
         repository: tk-framework-unrealqt
+        force_download: true
