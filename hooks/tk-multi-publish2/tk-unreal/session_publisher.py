@@ -95,6 +95,14 @@ class UnrealSessionPublisher(HookBaseClass):
         # Get fields from the current context
         fields = publisher.context.as_template_fields(template)
         
+        # Add version if not set
+        if "version" not in fields:
+            fields["version"] = 1
+            
+        # Add name if not set
+        if "name" not in fields and hasattr(item, "properties"):
+            fields["name"] = item.properties.get("name", "session")
+            
         # Apply fields to template to get the publish path
         path = template.apply_fields(fields)
         return path
