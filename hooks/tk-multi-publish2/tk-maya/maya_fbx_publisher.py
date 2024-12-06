@@ -59,8 +59,20 @@ class MayaFBXPublisher(HookBaseClass):
         """
         publisher = self.parent
         
-        # Get the path to publish
-        publish_template = self.get_template_by_name(settings["Publish Template"])
+        # Get the publish template from settings
+        publish_template_setting = settings.get("Publish Template")
+        if not publish_template_setting:
+            raise ValueError(
+                "Missing 'Publish Template' setting for the FBX publisher."
+            )
+            
+        # Get the template by name
+        publish_template = self.get_template_by_name(publish_template_setting.value)
+        if not publish_template:
+            raise ValueError(
+                f"Could not find template '{publish_template_setting.value}' in the template config."
+            )
+            
         publish_path = publish_template.apply_fields(item.properties)
         
         # Ensure the publish folder exists
