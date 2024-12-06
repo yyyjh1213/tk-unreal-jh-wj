@@ -4,7 +4,9 @@
 
 ################################################################################
 
-publish_help_url: &help_url "https://support.shotgunsoftware.com/hc/en-us/articles/115000068574-Integrations-User-Guide#The%20Publisher"
+# Support and help URLs
+support_url: &support_url "https://help.autodesk.com/view/SGSUB/ENU/?guid=SG_Supervisor_Artist_sa_integrations_sa_integrations_user_guide_html"
+help_url: *support_url
 
 includes:
 - ../../app_locations.yml
@@ -31,7 +33,7 @@ settings.tk-multi-publish2.unreal.project:
     settings:
       Publish Template: unreal_movie_publish
   
-  help_url: *help_url
+  help_url: *support_url
   location: "@apps.tk-multi-publish2.location"
 
 settings.tk-multi-publish2.unreal.asset_step:
@@ -106,5 +108,5 @@ settings.tk-multi-publish2.maya.asset_step.unreal:
       Export Path Template: unreal.maya_asset_fbx_publish
       Publish Template: unreal.asset_publish
   
-  help_url: *help_url
+  help_url: *support_url
   location: "@apps.tk-multi-publish2.location"
