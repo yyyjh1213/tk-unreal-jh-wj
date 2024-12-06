@@ -4,6 +4,9 @@ Hook for publishing Unreal Engine assets to Shotgun.
 import sgtk
 import os
 import unreal
+import stat
+import glob
+import time
 
 HookBaseClass = sgtk.get_hook_baseclass()
 
@@ -90,8 +93,9 @@ class UnrealAssetPublisher(HookBaseClass):
         # Apply fields to template to get the publish path
         publish_path = template.apply_fields(fields)
         
-        # Ensure the publish folder exists
+        # Ensure the publish folder exists and has correct permissions
         self._ensure_folder_exists(publish_path)
+        self._check_permissions(publish_path)
         
         # Get the asset path from item properties
         asset_path = item.properties.get("asset_path")
@@ -100,13 +104,15 @@ class UnrealAssetPublisher(HookBaseClass):
             return False
             
         try:
-            # Save the asset using Unreal Engine's API
-            asset = unreal.load_object(None, asset_path)
-            if not asset:
-                self.logger.error(f"Failed to load asset at path: {asset_path}")
+            # Ensure the asset is writable and not locked
+            if not self._ensure_file_writable(asset_path):
+                self.logger.error(f"Failed to make asset writable: {asset_path}")
                 return False
-                
-            unreal.EditorAssetLibrary.save_loaded_asset(asset)
+
+            # Save the asset using improved save package method
+            if not self._safe_save_package(asset_path, publish_path):
+                self.logger.error(f"Failed to save asset: {asset_path}")
+                return False
             
             # Register the publish
             publish_data = {
@@ -136,3 +142,88 @@ class UnrealAssetPublisher(HookBaseClass):
         folder = os.path.dirname(path)
         if not os.path.exists(folder):
             os.makedirs(folder)
+
+    def _check_permissions(self, path):
+        """
+        Check and set appropriate permissions for the file path.
+        """
+        try:
+            # Ensure directory exists with write permissions
+            directory = os.path.dirname(path)
+            os.makedirs(directory, exist_ok=True)
+            
+            # If file exists, ensure it's writable
+            if os.path.exists(path):
+                current_mode = os.stat(path).st_mode
+                os.chmod(path, current_mode | stat.S_IWRITE)
+                
+            return True
+        except Exception as e:
+            self.logger.error(f"Permission error: {str(e)}")
+            return False
+
+    def _ensure_file_writable(self, asset_path):
+        """
+        Ensure the asset file is writable and not locked.
+        """
+        try:
+            if unreal.EditorAssetLibrary.does_asset_exist(asset_path):
+                # Check if asset is locked and force checkout if necessary
+                if unreal.EditorAssetLibrary.is_asset_locked(asset_path):
+                    unreal.EditorAssetLibrary.force_asset_checkout(asset_path)
+                    
+                # Wait briefly to ensure the checkout is complete
+                time.sleep(0.5)
+                
+            return True
+        except Exception as e:
+            self.logger.error(f"Failed to make asset writable: {str(e)}")
+            return False
+
+    def _safe_save_package(self, asset_path, publish_path):
+        """
+        Safely save the asset package with improved error handling and temp file management.
+        """
+        try:
+            # Get the asset
+            asset = unreal.load_object(None, asset_path)
+            if not asset:
+                self.logger.error(f"Failed to load asset at path: {asset_path}")
+                return False
+
+            # Setup temp directory in project's Saved folder
+            temp_dir = os.path.join(unreal.Paths.project_saved_dir(), "Temp")
+            os.makedirs(temp_dir, exist_ok=True)
+
+            # Clean up any existing temp files
+            temp_pattern = os.path.join(temp_dir, "*.tmp")
+            for temp_file in glob.glob(temp_pattern):
+                try:
+                    os.remove(temp_file)
+                except:
+                    pass
+
+            # Save the asset with multiple retries
+            max_retries = 3
+            retry_delay = 1.0  # seconds
+            
+            for attempt in range(max_retries):
+                try:
+                    # Save the asset
+                    unreal.EditorAssetLibrary.save_loaded_asset(asset)
+                    
+                    # If we get here, save was successful
+                    return True
+                except Exception as e:
+                    if attempt < max_retries - 1:
+                        self.logger.warning(f"Save attempt {attempt + 1} failed, retrying in {retry_delay} seconds...")
+                        time.sleep(retry_delay)
+                    else:
+                        self.logger.error(f"All save attempts failed: {str(e)}")
+                        return False
+
+            return True
+
+        except Exception as e:
+            self.logger.error(f"Failed to save package: {str(e)}")
+            return False
