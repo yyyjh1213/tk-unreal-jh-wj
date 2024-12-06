@@ -11,6 +11,13 @@ class UnrealExporter(HookBaseClass):
     Hook for exporting assets from Unreal Engine.
     """
 
+    @property
+    def item_filters(self):
+        """
+        List of item types that this plugin is interested in.
+        """
+        return ["unreal.asset"]
+
     def accept(self, settings, item):
         """
         Method called by the publisher to determine if an item is of any

@@ -11,6 +11,13 @@ class MoviePublisher(HookBaseClass):
     Hook for publishing movies to Shotgun.
     """
 
+    @property
+    def item_filters(self):
+        """
+        List of item types that this plugin is interested in.
+        """
+        return ["unreal.movie"]
+
     def accept(self, settings, item):
         """
         Method called by the publisher to determine if an item is of any

@@ -10,6 +10,13 @@ class UnrealSessionPublisher(HookBaseClass):
     Publisher that publishes the current session to Shotgun.
     """
 
+    @property
+    def item_filters(self):
+        """
+        List of item types that this plugin is interested in.
+        """
+        return ["unreal.session"]
+
     def accept(self, settings, item):
         """
         Method called by the publisher to determine if an item is of any
