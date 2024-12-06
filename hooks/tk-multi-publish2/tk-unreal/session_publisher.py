@@ -83,11 +83,13 @@ class UnrealSessionPublisher(HookBaseClass):
         publisher = self.parent
         
         # Get the template from the settings
-        template_name = settings["Publish Template"].value
-        
+        template_name = settings.get("Publish Template")
+        if not template_name:
+            raise ValueError("'Publish Template' not found in settings!")
+            
         # Get the templates from the publisher
         templates = publisher.sgtk.templates
-        template = templates[template_name]
+        template = templates.get(template_name)
         
         if template is None:
             raise ValueError("Template '%s' not found!" % template_name)
