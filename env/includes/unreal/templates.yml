@@ -53,11 +53,20 @@ paths:
     # Unreal session publish template
     unreal_session_publish:
         definition: '@asset_root/pub/unreal/{name}.v{version}.uasset'
+    # Unreal level (umap) publish template
+    unreal_level_publish:
+        definition: '@asset_root/pub/unreal/maps/{name}.v{version}.umap'
+    # Unreal asset publish templates
+    unreal_asset_publish:
+        definition: '@asset_root/pub/unreal/content/{asset_type}/{name}.v{version}.uasset'
+    unreal_material_publish:
+        definition: '@asset_root/pub/unreal/materials/{name}.v{version}.uasset'
+    unreal_blueprint_publish:
+        definition: '@asset_root/pub/unreal/blueprints/{name}.v{version}.uasset'
     # Placeholder location for static mesh assets exported from Unreal
-    # Hook implementation intended to be a starting point for a pipeline
-    # No context info used in template, developers expected to further customize
     unreal.asset_publish:
         definition: 'assets/unreal/exports/{YYYY}_{MM}_{DD}/{name}.fbx'
+
 strings:
    # entity-specific templates for importing files into the Unreal content browser
     # template logic is defined in Python, not settings:
@@ -68,3 +77,7 @@ strings:
     unreal_loader_shot_name: "{ue_sg_shot_name}_{name}"
     unreal_loader_project_path: "/Game/Assets/"
     unreal_loader_project_name: "{name}"
+    # New loader paths for different asset types
+    unreal_loader_level_path: "/Game/Maps/"
+    unreal_loader_material_path: "/Game/Materials/"
+    unreal_loader_blueprint_path: "/Game/Blueprints/"
