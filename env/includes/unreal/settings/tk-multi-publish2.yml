@@ -5,8 +5,8 @@
 ################################################################################
 
 # Support and help URLs
-support_url: &support_url "https://help.autodesk.com/view/SGSUB/ENU/?guid=SG_Supervisor_Artist_sa_integrations_sa_integrations_user_guide_html"
-help_url: *support_url
+# support_url: &support_url "https://help.autodesk.com/view/SGSUB/ENU/?guid=SG_Supervisor_Artist_sa_integrations_sa_integrations_user_guide_html"
+# help_url: *support_url
 
 includes:
 - ../../app_locations.yml
