@@ -47,8 +47,9 @@ settings.tk-unreal.asset_step:
   location: "@tk-unreal.location"
   run_at_startup:
     - {app_instance: tk-multi-shotgunpanel, name: ''}
-  launch_builtin_plugins: [basic]
-  automatic_context_switch: false
+    - {app_instance: tk-multi-publish2, name: ''}
+  launch_builtin_plugins: [basic, shotgrid]
+  automatic_context_switch: true
 
 # asset - Maya FBX 파일 임포트를 위한 새로운 설정 추가
 settings.tk-unreal.asset:
@@ -63,5 +64,6 @@ settings.tk-unreal.asset:
   location: "@tk-unreal.location"
   run_at_startup:
     - {app_instance: tk-multi-shotgunpanel, name: ''}
-  launch_builtin_plugins: [basic]
-  automatic_context_switch: false
+    - {app_instance: tk-multi-publish2, name: ''}
+  launch_builtin_plugins: [basic, shotgrid]
+  automatic_context_switch: true
