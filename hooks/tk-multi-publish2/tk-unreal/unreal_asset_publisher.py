@@ -11,6 +11,13 @@ class UnrealAssetPublisher(HookBaseClass):
     Hook for publishing Unreal Engine assets to Shotgun.
     """
 
+    @property
+    def item_filters(self):
+        """
+        List of item types that this plugin is interested in.
+        """
+        return ["unreal.asset"]
+
     def accept(self, settings, item):
         """
         Method called by the publisher to determine if an item is of any

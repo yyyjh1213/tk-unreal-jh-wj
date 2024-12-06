@@ -10,6 +10,13 @@ class UnrealCollector(HookBaseClass):
     Collector that operates on the current Unreal Engine session.
     """
 
+    @property
+    def item_filters(self):
+        """
+        List of item types that this collector is interested in.
+        """
+        return ["unreal.session", "unreal.asset"]
+
     def process_current_session(self, settings, parent_item):
         """
         Analyzes the current session and creates publishable items for assets,
