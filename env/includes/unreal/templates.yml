@@ -55,14 +55,14 @@ paths:
         definition: '@asset_root/pub/unreal/{name}.v{version}.uasset'
     # Unreal level (umap) publish template
     unreal_level_publish:
-        definition: '@asset_root/pub/unreal/maps/{name}.v{version}.umap'
+        definition: '@asset_root/pub/unreal/Maps/{name}.v{version}.umap'
     # Unreal asset publish templates
     unreal_asset_publish:
-        definition: '@asset_root/pub/unreal/content/{ue_sg_asset_type}/{name}.v{version}.uasset'
+        definition: '@asset_root/pub/unreal/Assets/{ue_sg_asset_type}/{ue_sg_asset_name}/{name}.v{version}.uasset'
     unreal_material_publish:
-        definition: '@asset_root/pub/unreal/materials/{name}.v{version}.uasset'
+        definition: '@asset_root/pub/unreal/Materials/{name}.v{version}.uasset'
     unreal_blueprint_publish:
-        definition: '@asset_root/pub/unreal/blueprints/{name}.v{version}.uasset'
+        definition: '@asset_root/pub/unreal/Blueprints/{name}.v{version}.uasset'
     # Placeholder location for static mesh assets exported from Unreal
     unreal.asset_publish:
         definition: 'assets/unreal/exports/{YYYY}_{MM}_{DD}/{name}.fbx'
@@ -77,7 +77,7 @@ strings:
     unreal_loader_shot_name: "{ue_sg_shot_name}_{name}"
     unreal_loader_project_path: "/Game/Assets/"
     unreal_loader_project_name: "{name}"
-    # New loader paths for different asset types
+    # Asset type specific loader paths
     unreal_loader_level_path: "/Game/Maps/"
     unreal_loader_material_path: "/Game/Materials/"
     unreal_loader_blueprint_path: "/Game/Blueprints/"
