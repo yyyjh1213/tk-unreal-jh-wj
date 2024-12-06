@@ -62,12 +62,33 @@ class UnrealAssetPublisher(HookBaseClass):
     def publish(self, settings, item):
         """
         Executes the publish logic for the given item and settings.
+        
+        :param settings: Dictionary of Settings. The keys are strings, matching
+            the keys returned in the settings property. The values are `Setting`
+            instances.
+        :param item: Item to process
+        :returns: True if publish was successful, False otherwise
         """
         publisher = self.parent
         
-        # Get the path to publish
-        publish_template = self.get_template_by_name(settings["Publish Template"])
-        publish_path = publish_template.apply_fields(item.properties)
+        # Get the template from the settings
+        template_name = settings["Publish Template"].value
+        
+        # Get the templates from the publisher
+        templates = publisher.sgtk.templates
+        template = templates[template_name]
+        
+        if template is None:
+            raise ValueError("Template '%s' not found!" % template_name)
+            
+        # Get fields from the current context
+        fields = publisher.context.as_template_fields(template)
+        
+        # Update fields with item properties
+        fields.update(item.properties)
+        
+        # Apply fields to template to get the publish path
+        publish_path = template.apply_fields(fields)
         
         # Ensure the publish folder exists
         self._ensure_folder_exists(publish_path)
@@ -81,7 +102,7 @@ class UnrealAssetPublisher(HookBaseClass):
             "name": item.name,
             "version_number": item.properties.get("version_number", 1),
             "thumbnail_path": item.get_thumbnail_as_path(),
-            "published_file_type": settings["Asset Type"]
+            "published_file_type": settings["Asset Type"].value
         }
         
         # Register the publish using the base class' utility method

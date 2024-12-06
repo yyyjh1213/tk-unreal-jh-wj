@@ -72,10 +72,32 @@ class UnrealSessionPublisher(HookBaseClass):
 
     def _get_save_path(self, settings, item):
         """
-        Get the path where the session should be saved.
+        Get the path to save the current session.
+        
+        :param settings: Dictionary of Settings. The keys are strings, matching
+            the keys returned in the settings property. The values are `Setting`
+            instances.
+        :param item: Item to process
+        :returns: Path to save the current session
         """
-        template = self.get_template_by_name(settings["Publish Template"])
-        return template.apply_fields(item.properties)
+        publisher = self.parent
+        
+        # Get the template from the settings
+        template_name = settings["Publish Template"].value
+        
+        # Get the templates from the publisher
+        templates = publisher.sgtk.templates
+        template = templates[template_name]
+        
+        if template is None:
+            raise ValueError("Template '%s' not found!" % template_name)
+            
+        # Get fields from the current context
+        fields = publisher.context.as_template_fields(template)
+        
+        # Apply fields to template to get the publish path
+        path = template.apply_fields(fields)
+        return path
 
     def _register_publish(self, settings, item, path):
         """
