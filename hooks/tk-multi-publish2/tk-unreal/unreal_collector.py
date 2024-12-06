@@ -22,6 +22,7 @@ class UnrealCollector(HookBaseClass):
         Analyzes the current session and creates publishable items for assets,
         levels, and other content.
         """
+        self.logger.debug("Processing current Unreal session...")
         engine = self.parent.engine
         
         # Create an item representing the current Unreal session
@@ -31,22 +32,25 @@ class UnrealCollector(HookBaseClass):
             "Current Unreal Session"
         )
         
-        # Set the icon for the session item
-        session_item.set_icon_from_path("path/to/icon.png")
-        
-        # Get all selected actors/assets in the current level
-        selected_items = engine.get_selected_items()
-        
-        for item in selected_items:
-            # Create a publish item for each selected asset
-            asset_item = parent_item.create_item(
-                "unreal.asset",
-                "Unreal Asset",
-                item.get_name()
-            )
+        try:
+            # Get all selected actors/assets in the current level
+            selected_items = engine.get_selected_items()
+            self.logger.debug("Found %d selected items", len(selected_items))
             
-            # Set additional properties
-            asset_item.properties["asset_type"] = item.get_type()
-            asset_item.properties["content_path"] = item.get_path()
+            for item in selected_items:
+                # Create a publish item for each selected asset
+                asset_item = parent_item.create_item(
+                    "unreal.asset",
+                    "Unreal Asset",
+                    item.get_name()
+                )
+                
+                # Set additional properties
+                asset_item.properties["asset_type"] = item.get_type()
+                asset_item.properties["content_path"] = item.get_path()
+                self.logger.debug("Created publish item for asset: %s", item.get_name())
+                
+        except Exception as e:
+            self.logger.error("Error processing selected items: %s", str(e))
             
-        return True
+        return session_item
