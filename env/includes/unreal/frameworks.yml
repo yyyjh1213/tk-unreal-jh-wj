@@ -8,5 +8,5 @@ frameworks:
       location:
         type: github_release
         organization: ue4plugins
-        name: tk-framework-unrealqt
+        repository: tk-framework-unrealqt
         version: v1.3.1
