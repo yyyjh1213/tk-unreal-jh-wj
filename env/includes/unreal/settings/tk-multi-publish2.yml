@@ -96,7 +96,15 @@ settings.tk-multi-publish2.maya.asset_step.unreal:
   - name: Export Maya FBX
     hook: "{config}/tk-multi-publish2/tk-maya/maya_fbx_publisher.py"
     settings:
-      Publish Template: maya_fbx_publish
+      Publish Template: unreal.maya_asset_fbx_publish
+      
+  - name: Export and Publish to Unreal
+    hook: "{config}/tk-multi-publish2/tk-unreal/unreal_asset_publisher.py"
+    settings:
+      Asset Type: StaticMesh
+      Content Path: /Game/Assets/{asset_type}/{asset_name}
+      Export Path Template: unreal.maya_asset_fbx_publish
+      Publish Template: unreal.asset_publish
   
   help_url: *help_url
   location: "@apps.tk-multi-publish2.location"
