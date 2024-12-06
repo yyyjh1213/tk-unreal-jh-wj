@@ -58,7 +58,7 @@ paths:
         definition: '@asset_root/pub/unreal/maps/{name}.v{version}.umap'
     # Unreal asset publish templates
     unreal_asset_publish:
-        definition: '@asset_root/pub/unreal/content/{asset_type}/{name}.v{version}.uasset'
+        definition: '@asset_root/pub/unreal/content/{ue_sg_asset_type}/{name}.v{version}.uasset'
     unreal_material_publish:
         definition: '@asset_root/pub/unreal/materials/{name}.v{version}.uasset'
     unreal_blueprint_publish:
