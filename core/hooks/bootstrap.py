@@ -33,8 +33,7 @@ class Bootstrap(get_hook_baseclass()):
     # List of github repos for which we download releases, with a github token to
     # do the download if the repo is private
     _download_release_from_github = [
-        ("ue4plugins/tk-framework-unrealqt", ""),
-        ("GPLgithub/tk-framework-unrealqt", ""),
+        ("ue4plugins/tk-framework-unrealqt", ""),  # Unreal Qt Framework
     ]
 
     def can_cache_bundle(self, descriptor):
@@ -116,6 +115,9 @@ class Bootstrap(get_hook_baseclass()):
                         self.logger.error("Release %s does not exists" % version)
                     elif e.code == 401:
                         self.logger.error("Not authorised to access release %s." % version)
+                    elif e.code == 302:
+                        self.logger.error("Redirect detected. This might be due to S3 authentication issues.")
+                        self.logger.error("Please try downloading the framework manually from the Shotgun app store.")
                 raise
             response_d = json.loads(response.read())
             # Look up for suitable assets for this platform. Assets names
