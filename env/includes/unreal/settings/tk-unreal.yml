@@ -22,7 +22,26 @@ settings.tk-unreal.project:
     tk-multi-about:
       location: "@apps.tk-multi-about.location"
     tk-multi-loader2: "@settings.tk-multi-loader2.unreal"
-    tk-multi-publish2: "@settings.tk-multi-publish2.unreal.project"
+    tk-multi-publish2:
+      collector: "{config}/hooks/tk-multi-publish2/unreal/collectors/unreal_collector.py"
+      publish_plugins:
+      - name: Publish Unreal Session
+        hook: "{config}/hooks/tk-multi-publish2/unreal/publishers/session_publisher.py"
+        settings:
+          Publish Type: Unreal Session
+          Publish Template: unreal_session_publish
+      - name: Export and Publish Unreal Asset
+        hook: "{config}/hooks/tk-multi-publish2/unreal/publishers/unreal_asset_publisher.py"
+        settings:
+          Asset Type: StaticMesh
+          Content Path: /Game/Assets
+          Export Path Template: unreal_asset_export
+          Publish Template: unreal_asset_publish
+      - name: Render and Publish Movie
+        hook: "{config}/hooks/tk-multi-publish2/unreal/publishers/movie_publisher.py"
+        settings:
+          Publish Template: unreal_movie_publish
+      location: "@apps.tk-multi-publish2.location"
     tk-multi-pythonconsole:
       location: "@apps.tk-multi-pythonconsole.location"
     tk-multi-shotgunpanel: "@settings.tk-multi-shotgunpanel.unreal"
@@ -36,13 +55,32 @@ settings.tk-unreal.project:
   launch_builtin_plugins: [basic, shotgrid]
   automatic_context_switch: true
 
-# asset_step - Maya FBX 파일 임포트를 위한 새로운 설정 추가
+# asset_step
 settings.tk-unreal.asset_step:
   apps:
     tk-multi-about:
       location: "@apps.tk-multi-about.location"
     tk-multi-loader2: "@settings.tk-multi-loader2.unreal"
-    tk-multi-publish2: "@settings.tk-multi-publish2.unreal.asset_step"
+    tk-multi-publish2:
+      collector: "{config}/hooks/tk-multi-publish2/unreal/collectors/unreal_collector.py"
+      publish_plugins:
+      - name: Publish Unreal Session
+        hook: "{config}/hooks/tk-multi-publish2/unreal/publishers/session_publisher.py"
+        settings:
+          Publish Type: Unreal Session
+          Publish Template: unreal_session_publish
+      - name: Export and Publish Unreal Asset
+        hook: "{config}/hooks/tk-multi-publish2/unreal/publishers/unreal_asset_publisher.py"
+        settings:
+          Asset Type: StaticMesh
+          Content Path: /Game/Assets/{asset_type}/{asset_name}
+          Export Path Template: unreal_asset_export
+          Publish Template: unreal_asset_publish
+      - name: Render and Publish Movie
+        hook: "{config}/hooks/tk-multi-publish2/unreal/publishers/movie_publisher.py"
+        settings:
+          Publish Template: unreal_movie_publish
+      location: "@apps.tk-multi-publish2.location"
     tk-multi-pythonconsole:
       location: "@apps.tk-multi-pythonconsole.location"
     tk-multi-shotgunpanel: "@settings.tk-multi-shotgunpanel.unreal"
