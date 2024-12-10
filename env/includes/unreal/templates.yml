@@ -36,6 +36,9 @@ paths:
     #
     # Unreal
     #
+    # Unreal asset work files
+    unreal_asset_work:
+        definition: '@asset_root/dev/unreal/{name}.v{version}.fbx'
 
     # level sequence review output from unreal
     unreal.movie_publish:
