@@ -33,10 +33,16 @@ keys:
         type: str
     Step:
         type: str
+        shotgun_entity_type: Step
+        shotgun_field_name: code
     sg_asset_type:
         type: str
+        shotgun_entity_type: Asset
+        shotgun_field_name: sg_asset_type
     Asset:
         type: str
+        shotgun_entity_type: Asset
+        shotgun_field_name: code
     name:
         type: str
         filter_by: "^[A-Za-z0-9_]+$"
@@ -149,16 +155,6 @@ keys:
         type: str
     asset_namespace:
         type: str
-
-    shot_file_extension:
-        type: str
-        choices:
-            usd: USD
-            abc: Alembic
-            ma: Maya Ascii
-            mb: Maya Binary
-    number:
-        type: int
 
     # needed by the Alias import as reference functionality
     alias.extension:
