@@ -57,6 +57,7 @@ settings.tk-maya.asset_step:
         hook: "{config}/hooks/tk-multi-publish2/maya/publishers/publish_fbx.py"
         settings:
           Publish Template: maya_asset_fbx
+      location: "@apps.tk-multi-publish2.location"
     tk-multi-screeningroom: "@settings.tk-multi-screeningroom.rv"
     tk-multi-shotgunpanel: "@settings.tk-multi-shotgunpanel.maya"
     tk-multi-snapshot: "@settings.tk-multi-snapshot.maya.asset_step"
