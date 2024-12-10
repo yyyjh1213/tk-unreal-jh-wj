@@ -49,12 +49,24 @@ paths:
     unreal.maya_turntable_render:
         definition: '@asset_root/dev/images/{name}_turntable_v{version}.{ue_mov_ext}'
     unreal.maya_turntable_publish:
-        definition: '@asset_root/review/{Asset}_{name}_turntable_v{version}.{ue_mov_ext}'
+        definition: '@asset_root/pub/images/{name}_turntable_v{version}.{ue_mov_ext}'
+    # Unreal session publish template
+    unreal_session_publish:
+        definition: '@asset_root/pub/unreal/{name}.v{version}.uasset'
+    # Unreal level (umap) publish template
+    unreal_level_publish:
+        definition: '@asset_root/pub/unreal/Maps/{name}.v{version}.umap'
+    # Unreal asset publish templates
+    unreal_asset_publish:
+        definition: '@asset_root/pub/unreal/Assets/{ue_sg_asset_type}/{ue_sg_asset_name}/{name}.v{version}.uasset'
+    unreal_material_publish:
+        definition: '@asset_root/pub/unreal/Materials/{name}.v{version}.uasset'
+    unreal_blueprint_publish:
+        definition: '@asset_root/pub/unreal/Blueprints/{name}.v{version}.uasset'
     # Placeholder location for static mesh assets exported from Unreal
-    # Hook implementation intended to be a starting point for a pipeline
-    # No context info used in template, developers expected to further customize
     unreal.asset_publish:
         definition: 'assets/unreal/exports/{YYYY}_{MM}_{DD}/{name}.fbx'
+
 strings:
    # entity-specific templates for importing files into the Unreal content browser
     # template logic is defined in Python, not settings:
