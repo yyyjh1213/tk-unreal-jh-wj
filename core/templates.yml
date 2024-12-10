@@ -33,10 +33,16 @@ keys:
         type: str
     Step:
         type: str
+        shotgun_entity_type: Step
+        shotgun_field_name: code
     sg_asset_type:
         type: str
+        shotgun_entity_type: Asset
+        shotgun_field_name: sg_asset_type
     Asset:
         type: str
+        shotgun_entity_type: Asset
+        shotgun_field_name: code
     name:
         type: str
         filter_by: "^[A-Za-z0-9_]+$"
@@ -134,15 +140,12 @@ keys:
         type: str
         shotgun_entity_type: Task
         shotgun_field_name: content
-
     # Maya supports two extension types.
     maya_extension:
         type: str
         choices:
             ma: Maya Ascii (.ma)
             mb: Maya Binary (.mb)
-            fbx: FBX (.fbx)
-            abc: Alembic (.abc)
         default: mb
         alias: extension
     tail:

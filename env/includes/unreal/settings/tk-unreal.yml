@@ -32,3 +32,6 @@ settings.tk-unreal.project:
   - {app_instance: tk-multi-shotgunpanel, name: ''}
   launch_builtin_plugins: [basic]
   automatic_context_switch: false
+
+settings.tk-multi-publish2.unreal.project:
+  hook_publish_asset: "{self}/publish_file.py:{config}/hooks/tk-multi-publish2/basic/publish_asset.py"

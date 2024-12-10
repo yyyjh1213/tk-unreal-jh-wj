@@ -64,7 +64,11 @@ class AppLaunch(tank.Hook):
         sg = self.tank.shotgun
         project = context.project
         user = context.user
-        depart = sg.find_one("Department", [['users', 'in', user]], ['name'])
+        
+        # 사용자 정보가 있는 경우에만 부서 정보를 조회
+        depart = None
+        if user:
+            depart = sg.find_one("Department", [['users', 'in', user]], ['name'])
 
         # Check department permissions
         depart_confirm = False
