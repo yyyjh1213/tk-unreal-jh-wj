@@ -53,7 +53,7 @@ paths:
         definition: '@asset_root/review/images/{name}_turntable_v{version}.{ue_mov_ext}'
     # The location of published assets from Unreal
     unreal.asset_publish:
-        definition: '@asset_root/pub/unreal/{extension}/{name}.v{version}.fbx'
+        definition: '@asset_root/pub/unreal/fbx/{name}.v{version}.fbx'
 
 strings:
    # entity-specific templates for importing files into the Unreal content browser
