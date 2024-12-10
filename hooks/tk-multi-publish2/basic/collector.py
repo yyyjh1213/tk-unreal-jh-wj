@@ -169,12 +169,14 @@ class UnrealSessionCollector(HookBaseClass):
         """
         unreal_sg = sgtk.platform.current_engine().unreal_sg_engine
         sequence_edits = None
-
+        
         # 선택된 에셋 로깅 추가
         self.logger.debug("Selected assets: %s", unreal_sg.selected_assets)
+        self.logger.debug("Selected assets count: %s", len(unreal_sg.selected_assets))
         
         # Iterate through the selected assets and get their info and add them as items to be published
         for asset in unreal_sg.selected_assets:
+            self.logger.debug("Asset: %s", asset)
             if asset.asset_class_path.asset_name == "LevelSequence":
                 if sequence_edits is None:
                     sequence_edits = self.retrieve_sequence_edits()
