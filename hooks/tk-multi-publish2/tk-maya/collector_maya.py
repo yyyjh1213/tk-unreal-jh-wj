@@ -1,32 +1,34 @@
 """
-Collector for Maya that finds various publishable items in the current session.
+Maya collector that finds publishable items in the current session.
 """
-import sgtk
 import maya.cmds as cmds
+from ..common.base_collector import BaseCollector
 
-HookBaseClass = sgtk.get_hook_baseclass()
-
-class MayaCollector(HookBaseClass):
+class MayaCollector(BaseCollector):
     """
-    Collector that operates on the current Maya session.
+    Collector for Maya that finds various publishable items in the current session.
     """
-
-    def process_current_session(self, settings, parent_item):
+    
+    @property
+    def session_icon_name(self):
+        return "maya"
+    
+    def _create_session_item(self, parent_item):
         """
-        Analyzes the current session and creates publishable items for the
-        scene and any assets contained within it.
+        Create a session item representing the current Maya session.
         """
-        
-        # Create an item representing the current maya session
-        session_item = parent_item.create_item(
+        return parent_item.create_item(
             "maya.session",
             "Maya Session",
             cmds.file(query=True, sceneName=True)
         )
-        
-        # Get the icon path to display for this item
-        icon_path = self._get_icon_path("maya")
-        session_item.set_icon_from_path(icon_path)
+    
+    def process_current_session(self, settings, parent_item):
+        """
+        Analyzes the current session and creates publishable items.
+        """
+        # Get the base session item
+        session_item = super().process_current_session(settings, parent_item)
         
         # Look for meshes in the scene
         meshes = cmds.ls(type="mesh", long=True)
@@ -43,10 +45,3 @@ class MayaCollector(HookBaseClass):
             mesh_item.properties["meshes"] = meshes
             
         return True
-
-    def _get_icon_path(self, icon_name):
-        """
-        Return the full path to the given icon.
-        """
-        # Look for the icon in the hooks/icons directory
-        return "path/to/icons/%s.png" % icon_name

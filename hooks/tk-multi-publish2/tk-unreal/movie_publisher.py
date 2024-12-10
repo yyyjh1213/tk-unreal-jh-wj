@@ -1,23 +1,23 @@
 """
 Hook for publishing movies from Unreal Engine to Shotgun.
 """
-import sgtk
 import os
+from ..common.base_publisher import BasePublisher
+from ..common import utils
 
-HookBaseClass = sgtk.get_hook_baseclass()
-
-class MoviePublisher(HookBaseClass):
+class MoviePublisher(BasePublisher):
     """
-    Hook for publishing movies to Shotgun.
+    Plugin for publishing movies from Unreal Engine.
     """
-
+    
     @property
-    def item_filters(self):
-        """
-        List of item types that this plugin is interested in.
-        """
+    def accepted_item_types(self):
         return ["unreal.movie"]
-
+    
+    @property
+    def publish_file_type(self):
+        return "Movie"
+    
     def accept(self, settings, item):
         """
         Method called by the publisher to determine if an item is of any
@@ -59,62 +59,19 @@ class MoviePublisher(HookBaseClass):
             
         return True
 
-    def publish(self, settings, item):
-        """
-        Executes the publish logic for the given item and settings.
-        """
-        publisher = self.parent
-        
-        # Get the publish template from settings
-        publish_template_setting = settings.get("Publish Template")
-        if not publish_template_setting:
-            raise ValueError(
-                "Missing 'Publish Template' setting for the movie publisher."
-            )
-            
-        # Get the template by name
-        publish_template = self.get_template_by_name(publish_template_setting.value)
-        if not publish_template:
-            raise ValueError(
-                f"Could not find template '{publish_template_setting.value}' in the template config."
-            )
-            
-        publish_path = publish_template.apply_fields(item.properties)
-        
-        # Ensure the publish folder exists
-        self._ensure_folder_exists(publish_path)
-        
-        # Copy the movie file to the publish location
-        self._copy_movie_file(item.properties["movie_path"], publish_path)
-        
-        # Register the publish
-        publish_data = {
-            "tk": publisher.sgtk,
-            "context": item.context,
-            "comment": item.description,
-            "path": publish_path,
-            "name": item.name,
-            "version_number": item.properties.get("version_number", 1),
-            "thumbnail_path": item.get_thumbnail_as_path(),
-            "published_file_type": "Movie"
-        }
-        
-        # Register the publish using the base class' utility method
-        super(MoviePublisher, self)._register_publish(**publish_data)
-        
-        return True
-
-    def _ensure_folder_exists(self, path):
-        """
-        Ensure the folder exists for the given path.
-        """
-        folder = os.path.dirname(path)
-        if not os.path.exists(folder):
-            os.makedirs(folder)
-            
-    def _copy_movie_file(self, source_path, target_path):
+    def _do_publish(self, settings, item, publish_path):
         """
         Copy the movie file to the publish location.
         """
+        # Copy the movie file to the publish location
+        self._copy_movie_file(item.properties["movie_path"], publish_path)
+    
+    def _copy_movie_file(self, source_path, target_path):
+        """
+        Copy the movie file to the target location.
+        """
+        utils.ensure_folder_exists(target_path)
+        
+        # Use shutil to copy the file
         import shutil
         shutil.copy2(source_path, target_path)
