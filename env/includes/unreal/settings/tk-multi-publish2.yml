@@ -10,7 +10,7 @@ includes:
 - ../../app_locations.yml
 
 settings.tk-multi-publish2.unreal.project:
-  collector: "{self}/collector.py:{engine}/tk-multi-publish2/basic/collector.py:{config}/hooks/tk-multi-publish2/basic/collector.py"
+  collector: "{self}/collector.py:{config}/hooks/tk-multi-publish2/basic/collector.py"
   collector_settings:
       Work Template: unreal_asset_work   #추가
   publish_plugins:
@@ -21,21 +21,21 @@ settings.tk-multi-publish2.unreal.project:
     hook: "{self}/upload_version.py"
     settings: {}
   - name: Publish to ShotGrid
-    hook: "{self}/publish_file.py:{engine}/tk-multi-publish2/basic/publish_session.py"
+    hook: "{self}/publish_file.py:{config}/hooks/tk-multi-publish2/basic/publish_session.py"
     settings: {}
   - name: Export FBX and Publish to ShotGrid
     hook: "{self}/publish_file.py:{config}/hooks/tk-multi-publish2/basic/publish_asset.py"  # {engine} 대신 {config} 사용
     settings:
         Publish Template: unreal.asset_publish
   - name: Render Movie and Submit for Review
-    hook: "{self}/publish_file.py:{engine}/tk-multi-publish2/basic/publish_movie.py"
+    hook: "{self}/publish_file.py:{config}/hooks/tk-multi-publish2/basic/publish_movie.py"
     settings:
         Publish Template: unreal.movie_publish
   help_url: *help_url
   location: "@apps.tk-multi-publish2.location"
 
 settings.tk-multi-publish2.maya.asset_step.unreal:
-  collector: "{self}/collector.py:{engine}/tk-multi-publish2/basic/collector.py:{tk-framework-unrealqt_v1.x.x}/tk-multi-publish2/tk-maya/basic/collector.py"
+  collector: "{self}/collector.py:{config}/hooks/tk-multi-publish2/basic/collector.py"
   collector_settings:
       Work Template: maya_asset_work
   publish_plugins:
@@ -46,22 +46,22 @@ settings.tk-multi-publish2.maya.asset_step.unreal:
     hook: "{self}/upload_version.py"
     settings: {}
   - name: Begin file versioning
-    hook: "{engine}/tk-multi-publish2/basic/start_version_control.py"
+    hook: "{config}/hooks/tk-multi-publish2/basic/start_version_control.py"
     settings: {}
   - name: Publish to ShotGrid
-    hook: "{self}/publish_file.py:{engine}/tk-multi-publish2/basic/publish_session.py"
+    hook: "{self}/publish_file.py:{config}/hooks/tk-multi-publish2/basic/publish_session.py"
     settings:
         Publish Template: maya_asset_publish
   - name: Publish to ShotGrid
-    hook: "{self}/publish_file.py:{engine}/tk-multi-publish2/basic/publish_session_geometry.py"
+    hook: "{self}/publish_file.py:{config}/hooks/tk-multi-publish2/basic/publish_session_geometry.py"
     settings:
         Publish Template: asset_alembic_cache
   - name: Publish FBX to ShotGrid
-    hook: "{self}/publish_file.py:{tk-framework-unrealqt_v1.x.x}/tk-multi-publish2/tk-maya/basic/publish_fbx.py"
+    hook: "{self}/publish_file.py:{config}/hooks/tk-multi-publish2/tk-maya/basic/publish_fbx.py"
     settings:
         Publish Template: unreal.maya_asset_fbx_publish
   - name: Publish and Submit for Review
-    hook: "{self}/publish_file.py:{tk-framework-unrealqt_v1.x.x}/tk-multi-publish2/tk-maya/basic/publish_turntable.py"
+    hook: "{self}/publish_file.py:{config}/hooks/tk-multi-publish2/tk-maya/basic/publish_turntable.py"
     settings:
         Work Template: unreal.maya_turntable_render
         Publish Template: unreal.maya_turntable_publish
