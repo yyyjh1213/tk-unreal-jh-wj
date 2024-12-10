@@ -24,6 +24,13 @@ class BasePublisher(HookBaseClass):
             },
         }
     
+    @property
+    def publish_file_type(self):
+        """
+        The type of file being published. Must be implemented by subclasses.
+        """
+        raise NotImplementedError
+    
     def accept(self, settings, item):
         """
         Method called by the publisher to determine if an item is of any interest to this plugin.
@@ -63,7 +70,8 @@ class BasePublisher(HookBaseClass):
         utils.ensure_folder_exists(publish_path)
         
         # Do the actual publish
-        self._do_publish(settings, item, publish_path)
+        if not self._do_publish(settings, item, publish_path):
+            return False
         
         # Register the publish
         publish_data = utils.get_publish_data(
@@ -75,13 +83,13 @@ class BasePublisher(HookBaseClass):
         self._register_publish(**publish_data)
         
         return True
-    
+        
     def _get_publish_path(self, template, item):
         """
         Get the publish path. Override in subclasses if needed.
         """
         return template.apply_fields(item.properties)
-    
+        
     def _do_publish(self, settings, item, publish_path):
         """
         Do the actual publish. Must be implemented by subclasses.
@@ -92,12 +100,5 @@ class BasePublisher(HookBaseClass):
     def accepted_item_types(self):
         """
         List of item types that this plugin accepts. Must be implemented by subclasses.
-        """
-        raise NotImplementedError
-    
-    @property
-    def publish_file_type(self):
-        """
-        The type of file being published. Must be implemented by subclasses.
         """
         raise NotImplementedError

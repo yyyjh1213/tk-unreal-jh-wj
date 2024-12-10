@@ -26,26 +26,14 @@ class BaseCollector(HookBaseClass):
     
     def process_current_session(self, settings, parent_item):
         """
-        Base implementation of session processing.
-        """
-        # Create the session item
-        session_item = self._create_session_item(parent_item)
-        
-        # Set the icon
-        icon_path = utils.get_icon_path(self, self.session_icon_name)
-        session_item.set_icon_from_path(icon_path)
-        
-        return session_item
-    
-    def _create_session_item(self, parent_item):
-        """
-        Create a session item. Override in subclasses.
+        Analyzes the current session and creates publishable items.
+        Must be implemented by subclasses.
         """
         raise NotImplementedError
     
-    @property
-    def session_icon_name(self):
+    def process_file(self, settings, parent_item, path):
         """
-        Name of the session icon. Override in subclasses.
+        Analyzes the given file and creates publishable items.
+        Can be implemented by subclasses if needed.
         """
-        raise NotImplementedError
+        return None

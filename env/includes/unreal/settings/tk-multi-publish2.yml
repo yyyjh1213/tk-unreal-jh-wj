@@ -12,16 +12,16 @@ includes:
 - ../../app_locations.yml
 
 settings.tk-multi-publish2.unreal.project:
-  collector: "{config}/hooks/tk-multi-publish2/tk-unreal/unreal_collector.py"
+  collector: "{config}/hooks/tk-multi-publish2/unreal/collectors/unreal_collector.py"
   publish_plugins:
   - name: Publish Unreal Session
-    hook: "{config}/hooks/tk-multi-publish2/tk-unreal/session_publisher.py"
+    hook: "{config}/hooks/tk-multi-publish2/unreal/publishers/session_publisher.py"
     settings:
       Publish Type: Unreal Session
       Publish Template: unreal_session_publish
   
   - name: Export and Publish Unreal Asset
-    hook: "{config}/hooks/tk-multi-publish2/tk-unreal/unreal_exporter.py:{config}/hooks/tk-multi-publish2/tk-unreal/unreal_asset_publisher.py"
+    hook: "{config}/hooks/tk-multi-publish2/unreal/publishers/unreal_asset_publisher.py"
     settings:
       Asset Type: StaticMesh
       Content Path: /Game/Assets
@@ -29,23 +29,23 @@ settings.tk-multi-publish2.unreal.project:
       Publish Template: unreal_asset_publish
   
   - name: Render and Publish Movie
-    hook: "{config}/hooks/tk-multi-publish2/tk-unreal/movie_publisher.py"
+    hook: "{config}/hooks/tk-multi-publish2/unreal/publishers/movie_publisher.py"
     settings:
       Publish Template: unreal_movie_publish
   
   location: "@apps.tk-multi-publish2.location"
 
 settings.tk-multi-publish2.unreal.asset_step:
-  collector: "{config}/hooks/tk-multi-publish2/tk-unreal/unreal_collector.py"
+  collector: "{config}/hooks/tk-multi-publish2/unreal/collectors/unreal_collector.py"
   publish_plugins:
   - name: Publish Unreal Session
-    hook: "{config}/hooks/tk-multi-publish2/tk-unreal/session_publisher.py"
+    hook: "{config}/hooks/tk-multi-publish2/unreal/publishers/session_publisher.py"
     settings:
       Publish Type: Unreal Session
       Publish Template: unreal_session_publish
   
   - name: Export and Publish Unreal Asset
-    hook: "{config}/hooks/tk-multi-publish2/tk-unreal/unreal_exporter.py:{config}/hooks/tk-multi-publish2/tk-unreal/unreal_asset_publisher.py"
+    hook: "{config}/hooks/tk-multi-publish2/unreal/publishers/unreal_asset_publisher.py"
     settings:
       Asset Type: StaticMesh
       Content Path: /Game/Assets/{asset_type}/{asset_name}
@@ -53,7 +53,7 @@ settings.tk-multi-publish2.unreal.asset_step:
       Publish Template: unreal_asset_publish
   
   - name: Render and Publish Movie
-    hook: "{config}/hooks/tk-multi-publish2/tk-unreal/movie_publisher.py"
+    hook: "{config}/hooks/tk-multi-publish2/unreal/publishers/movie_publisher.py"
     settings:
       Publish Template: unreal_movie_publish
   

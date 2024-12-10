@@ -4,17 +4,6 @@ Common utility functions for publish hooks.
 import os
 import sgtk
 
-def get_icon_path(hook_instance, icon_name):
-    """
-    Return the full path to the given icon.
-    """
-    return os.path.join(
-        hook_instance.disk_location,
-        os.pardir,
-        "icons",
-        f"{icon_name}.png"
-    )
-
 def ensure_folder_exists(path):
     """
     Ensure the folder exists for the given path.
