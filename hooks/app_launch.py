@@ -79,34 +79,22 @@ class AppLaunch(tank.Hook):
             sys.path.append(packages)
 
         if depart_confirm:
-            # adapter = get_adapter(platform.system())
-            # packages = get_rez_packages(sg, app_name, version, system, project)
+            # Rez 관련 코드가 주석 처리되어 있으므로 기본 실행 방식을 사용
+            if tank.util.is_linux():
+                cmd = "%s %s &" % (app_path, app_args)
+            elif tank.util.is_macos():
+                if app_path.endswith(".app"):
+                    cmd = 'open -n -a "%s"' % (app_path)
+                    if app_args:
+                        cmd += " --args %s" % app_args
+                else:
+                    cmd = "%s %s &" % (app_path, app_args)
+            else:
+                cmd = 'start /B "App" "%s" %s' % (app_path, app_args)
 
-            # try:
-            #     import rez as _
-            # except ImportError:
-            #     rez_path = adapter.get_rez_module_root()
-            #     if not rez_path:
-            #         raise EnvironmentError('rez is not installed and could not be automatically found. Cannot continue.')
-                
-            #     if sys.version_info.major == 3:
-            #         rez_path = rez_path.decode('utf-8')
-                
-            #     sys.path.append(rez_path)
+            return_code = os.system(cmd)
+            return {'command': cmd, 'return_code': return_code}
             
-            # from rez import resolved_context
-
-            # if not packages or app_name == 'unreal':
-            #     if not packages:
-            #         self.logger.debug('No rez packages were found. The default boot, instead.')
-            adapter = get_adapter(platform.system())
-            command = adapter.get_command(app_path, app_args)
-            return_code = os.system(command)
-            return {'command': command, 'return_code': return_code}
-            
-            # context = resolved_context.ResolvedContext(packages)
-            # return adapter.execute(context, app_args, app_name)
-
         else:
             if tank.util.is_linux():
                 # on linux, we just run the executable directly
