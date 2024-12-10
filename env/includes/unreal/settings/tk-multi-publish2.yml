@@ -1,0 +1,110 @@
+# This file is based on templates provided and copyrighted by Autodesk, Inc.
+# This file has been modified by Epic Games, Inc. and is subject to the license
+# file included in this repository.
+
+################################################################################
+
+# Support and help URLs
+support_url: &support_url "https://help.autodesk.com/view/SGSUB/ENU/?guid=SG_Supervisor_Artist_sa_integrations_sa_integrations_user_guide_html"
+help_url: *support_url
+
+includes:
+- ../../app_locations.yml
+
+settings.tk-multi-publish2.unreal.project:
+  collector: "{config}/hooks/tk-multi-publish2/tk-unreal/unreal_collector.py"
+  publish_plugins:
+  - name: Publish Unreal Session
+    hook: "{config}/hooks/tk-multi-publish2/tk-unreal/session_publisher.py"
+    settings:
+      Publish Type: Unreal Session
+      Publish Template: unreal_session_publish
+  
+  - name: Export and Publish Unreal Asset
+    hook: "{config}/hooks/tk-multi-publish2/tk-unreal/unreal_exporter.py:{config}/hooks/tk-multi-publish2/tk-unreal/unreal_asset_publisher.py"
+    settings:
+      Asset Type: StaticMesh
+      Content Path: /Game/Assets
+      Export Path Template: unreal_asset_export
+      Publish Template: unreal_asset_publish
+  
+  - name: Render and Publish Movie
+    hook: "{config}/hooks/tk-multi-publish2/tk-unreal/movie_publisher.py"
+    settings:
+      Publish Template: unreal_movie_publish
+  
+  location: "@apps.tk-multi-publish2.location"
+
+settings.tk-multi-publish2.unreal.asset_step:
+  collector: "{config}/hooks/tk-multi-publish2/tk-unreal/unreal_collector.py"
+  publish_plugins:
+  - name: Publish Unreal Session
+    hook: "{config}/hooks/tk-multi-publish2/tk-unreal/session_publisher.py"
+    settings:
+      Publish Type: Unreal Session
+      Publish Template: unreal_session_publish
+  
+  - name: Export and Publish Unreal Asset
+    hook: "{config}/hooks/tk-multi-publish2/tk-unreal/unreal_exporter.py:{config}/hooks/tk-multi-publish2/tk-unreal/unreal_asset_publisher.py"
+    settings:
+      Asset Type: StaticMesh
+      Content Path: /Game/Assets/{asset_type}/{asset_name}
+      Export Path Template: unreal_asset_export
+      Publish Template: unreal_asset_publish
+  
+  - name: Render and Publish Movie
+    hook: "{config}/hooks/tk-multi-publish2/tk-unreal/movie_publisher.py"
+    settings:
+      Publish Template: unreal_movie_publish
+  
+  location: "@apps.tk-multi-publish2.location"
+
+settings.tk-multi-publish2.unreal.asset:
+  collector: "{config}/hooks/tk-multi-publish2/tk-unreal/unreal_collector.py"
+  publish_plugins:
+  - name: Publish Unreal Session
+    hook: "{config}/hooks/tk-multi-publish2/tk-unreal/session_publisher.py"
+    settings:
+      Publish Type: Unreal Session
+      Publish Template: unreal_session_publish
+  
+  - name: Export and Publish Unreal Asset
+    hook: "{config}/hooks/tk-multi-publish2/tk-unreal/unreal_exporter.py:{config}/hooks/tk-multi-publish2/tk-unreal/unreal_asset_publisher.py"
+    settings:
+      Asset Type: StaticMesh
+      Content Path: /Game/Assets/{asset_type}/{asset_name}
+      Export Path Template: unreal_asset_export
+      Publish Template: unreal_asset_publish
+  
+  - name: Render and Publish Movie
+    hook: "{config}/hooks/tk-multi-publish2/tk-unreal/movie_publisher.py"
+    settings:
+      Publish Template: unreal_movie_publish
+  
+  location: "@apps.tk-multi-publish2.location"
+
+settings.tk-multi-publish2.maya.asset_step.unreal:
+  collector: "{config}/hooks/tk-multi-publish2/tk-maya/collector_maya.py"
+  collector_settings:
+    Work Template: maya_asset_work
+  publish_plugins:
+  - name: Publish Maya Session
+    hook: "{config}/hooks/tk-multi-publish2/tk-maya/session_publisher.py"
+    settings:
+      Publish Type: Maya Session
+      Publish Template: maya_session_publish
+  
+  - name: Export Maya FBX
+    hook: "{config}/hooks/tk-multi-publish2/tk-maya/maya_fbx_publisher.py"
+    settings:
+      Publish Template: unreal.maya_asset_fbx_publish
+      
+  - name: Export and Publish to Unreal
+    hook: "{config}/hooks/tk-multi-publish2/tk-unreal/unreal_asset_publisher.py"
+    settings:
+      Asset Type: StaticMesh
+      Content Path: /Game/Assets/{asset_type}/{asset_name}
+      Export Path Template: unreal.maya_asset_fbx_publish
+      Publish Template: unreal.asset_publish
+  
+  location: "@apps.tk-multi-publish2.location"
