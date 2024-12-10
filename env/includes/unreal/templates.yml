@@ -31,9 +31,6 @@ keys:
         choices:
             mov: Quicktime Movie (.mov)
             avi: Audio Video Interleaved (.avi)
-    extension:
-        type: str
-        filter_by: "^[A-Za-z0-9]+$"
 
 paths:
     #
@@ -54,9 +51,7 @@ paths:
     # The location of turntable review output published in Unreal
     unreal.maya_turntable_publish:
         definition: '@asset_root/review/images/{name}_turntable_v{version}.{ue_mov_ext}'
-    # Placeholder location for static mesh assets exported from Unreal
-    # Hook implementation intended to be a starting point for a pipeline
-    # No context info used in template, developers expected to further customize
+    # The location of published assets from Unreal
     unreal.asset_publish:
         definition: 'assets/{sg_asset_type}/{Asset}/{Step}/pub/unreal/{extension}/{name}.v{version}.fbx'
 
