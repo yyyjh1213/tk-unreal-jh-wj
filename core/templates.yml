@@ -622,7 +622,10 @@ paths:
     maya_asset_publish:
         definition: '@asset_root/pub/maya/{extension}/{name}.{Step}.v{version}.{extension}'
         root_name: primary
-
+    # The location of published maya fbx files
+    maya_asset_publish_fbx:
+        definition: '@asset_root/pub/maya/fbx/{name}.{Step}.v{version}.fbx'
+        root_name: primary
     #
     # Houdini
     #
