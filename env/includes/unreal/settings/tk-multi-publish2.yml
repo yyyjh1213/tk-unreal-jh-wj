@@ -23,12 +23,7 @@ settings.tk-multi-publish2.unreal.project:
     settings: {}
   - name: Export FBX and Publish to ShotGrid
     hook: "{self}/publish_file.py:{engine}/tk-multi-publish2/basic/publish_asset.py"
-    settings:
-        Publish Template: unreal.asset_publish
-        Template Fields:
-            Step: "dev"
-            version: 1
-            sg_asset_type: "Prop"  # Asset 타입 기본값
+    settings: {}
   - name: Render Movie and Submit for Review
     hook: "{self}/publish_file.py:{engine}/tk-multi-publish2/basic/publish_movie.py"
     settings:
