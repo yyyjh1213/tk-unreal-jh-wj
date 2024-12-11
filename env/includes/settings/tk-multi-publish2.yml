@@ -182,10 +182,6 @@ settings.tk-multi-publish2.maya.asset_step:
     hook: "{self}/publish_file.py:{engine}/tk-multi-publish2/basic/publish_session_geometry.py"
     settings:
         Publish Template: asset_alembic_cache
-  - name: Export and Publish OBJ
-    hook: "{self}/publish_file.py:{engine}/tk-multi-publish2/basic/publish_obj.py"
-    settings:
-        Publish Template: maya_asset_publish_obj
   - name: Export and Publish FBX
     hook: "{self}/publish_file.py:{engine}/tk-multi-publish2/basic/publish_fbx.py"
     settings:
