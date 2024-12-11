@@ -75,12 +75,11 @@ class AppLaunch(tank.Hook):
         if depart and depart.get('name'):  
             if (depart['name'] == 'RND' and engine_name == 'tk-nuke') or \
                (depart['name'] in ['General']) or \
-               (engine_name == 'tk-unreal') or \
-               (engine_name == 'tk-maya'):  
+               (engine_name in ['tk-unreal', 'tk-maya']):  
                 depart_confirm = True
         else:
-            # Department 정보가 없는 경우 Unreal Engine은 허용
-            if engine_name == 'tk-unreal':
+            # Department 정보가 없는 경우 Unreal Engine과 Maya는 허용
+            if engine_name in ['tk-unreal', 'tk-maya']:
                 depart_confirm = True
 
         # Handle UE special case for Python 3
