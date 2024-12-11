@@ -178,8 +178,6 @@ settings.tk-multi-publish2.maya.asset_step:
     hook: "{self}/publish_file.py:{engine}/tk-multi-publish2/basic/publish_session.py"
     settings:
         Publish Template: maya_asset_publish
-        Template Fields:
-            Step: "{context.step}" #Step 정보를 컨텍스트에서 가져옴
   - name: Publish to Flow Production Tracking
     hook: "{self}/publish_file.py:{engine}/tk-multi-publish2/basic/publish_session_geometry.py"
     settings:
