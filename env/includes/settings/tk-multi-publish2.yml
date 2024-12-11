@@ -186,10 +186,10 @@ settings.tk-multi-publish2.maya.asset_step:
     hook: "{self}/publish_file.py:{engine}/tk-multi-publish2/basic/publish_fbx.py"
     settings:
         Publish Template: maya_asset_publish_fbx
-  - name: Export and Publish Alembic
-    hook: "{self}/publish_file.py:{engine}/tk-multi-publish2/basic/publish_alembic.py"
-    settings:
-        Publish Template: maya_asset_publish_abc
+  # - name: Export and Publish Alembic
+  #   hook: "{self}/publish_file.py:{engine}/tk-multi-publish2/basic/publish_alembic.py"
+  #   settings:
+  #       Publish Template: maya_asset_publish_abc
   help_url: *help_url
   location: "@apps.tk-multi-publish2.location"
 
