@@ -184,6 +184,7 @@ class UnrealAssetPublishPlugin(HookBaseClass):
         if not context.step:
             self.logger.error("Step context is required for publishing")
             return False
+            self.logger.info("Found Step in path: %s" % template_fields["Step"])
 
         asset_path = item.properties.get("asset_path")
         asset_name = item.properties.get("asset_name")
