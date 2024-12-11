@@ -75,7 +75,8 @@ class AppLaunch(tank.Hook):
         if depart and depart.get('name'):  
             if (depart['name'] == 'RND' and engine_name == 'tk-nuke') or \
                (depart['name'] in ['General']) or \
-               (engine_name == 'tk-unreal'):  
+               (engine_name == 'tk-unreal') or \
+               (engine_name == 'tk-maya'):  
                 depart_confirm = True
         else:
             # Department 정보가 없는 경우 Unreal Engine은 허용

@@ -165,6 +165,25 @@ class UnrealAssetPublishPlugin(HookBaseClass):
         :param item: Item to process
         :returns: True if item is valid, False otherwise.
         """
+        # 현재 context 확인
+        engine = sgtk.platform.current_engine()
+        context = item.context
+
+        # context 정보 로깅
+        self.logger.info("Current Context Info:")
+        self.logger.info("Project: %s" % context.project)
+        self.logger.info("Entity: %s" % context.entity)
+        self.logger.info("Step: %s" % context.step)
+        self.logger.info("Task: %s" % context.task)
+
+        # 필수 context 정보 확인
+        if not context.entity or context.entity["type"] != "Asset":
+            self.logger.error("Asset context is required for publishing")
+            return False
+
+        if not context.step:
+            self.logger.error("Step context is required for publishing")
+            return False
 
         asset_path = item.properties.get("asset_path")
         asset_name = item.properties.get("asset_name")
