@@ -165,103 +165,43 @@ class UnrealAssetPublishPlugin(HookBaseClass):
         :param item: Item to process
         :returns: True if item is valid, False otherwise.
         """
-        # 현재 context 확인
-        engine = sgtk.platform.current_engine()
+        # context 정보 확인
         context = item.context
 
-        # context 정보 로깅
-        self.logger.info("Current Context Info:")
-        self.logger.info("Project: %s" % context.project)
-        self.logger.info("Entity: %s" % context.entity)
-        self.logger.info("Step: %s" % context.step)
-        self.logger.info("Task: %s" % context.task)
-
-        # 필수 context 정보 확인
+        # Asset 확인
         if not context.entity or context.entity["type"] != "Asset":
             self.logger.error("Asset context is required for publishing")
             return False
 
-        if not context.step:
-            self.logger.error("Step context is required for publishing")
+        # Template fields 확인
+        publish_template = item.properties["publish_template"]
+        if not publish_template:
+            self.logger.error("No publish template defined")
             return False
 
+        # Asset 정보 확인
         asset_path = item.properties.get("asset_path")
         asset_name = item.properties.get("asset_name")
         if not asset_path or not asset_name:
-            self.logger.debug("Asset path or name not configured.")
+            self.logger.error("Asset path or name not configured")
             return False
 
-        publish_template = item.properties["publish_template"]
+        # Template fields 구성
+        fields = {
+            "name": asset_name,
+            "Asset": context.entity["name"],
+            "Step": context.step["name"] if context.step else None,
+            "version": 1  # 기본값
+        }
 
-        # Add the Unreal asset name to the fields
-        fields = {"name": asset_name}
-
-        # Add today's date to the fields
-        date = datetime.date.today()
-        fields["YYYY"] = date.year
-        fields["MM"] = date.month
-        fields["DD"] = date.day
-
-        # Get current context information
-        current_entity = item.context.entity
-        if current_entity:
-            # Asset 정보 추가
-            fields["Asset"] = current_entity["code"]
-            
-            # Asset 타입 가져오기
-            asset_info = self.parent.shotgun.find_one(
-                "Asset",
-                [["id", "is", current_entity["id"]]],
-                ["sg_asset_type"]
-            )
-            if asset_info and asset_info["sg_asset_type"]:
-                fields["sg_asset_type"] = asset_info["sg_asset_type"]
-
-        # Step 정보 가져오기
-        current_step = item.context.step
-        if current_step:
-            fields["Step"] = current_step["name"]
-
-        # Version 번호 생성 (여기서는 간단히 1로 설정)
-        fields["version"] = 1
-
-        # Stash the Unreal asset path and name in properties
-        item.properties["asset_path"] = asset_path
-        item.properties["asset_name"] = asset_name
-
+        # Template fields 유효성 검사
         try:
-            # Get destination path for exported FBX from publish template
-            publish_path = publish_template.apply_fields(fields)
-            publish_path = os.path.normpath(publish_path)
-            if not os.path.isabs(publish_path):
-                # If the path is not absolute, prepend the publish folder setting.
-                publish_folder = settings["Publish Folder"].value
-                if not publish_folder:
-                    publish_folder = unreal.Paths.project_saved_dir()
-                publish_path = os.path.abspath(
-                    os.path.join(
-                        publish_folder,
-                        publish_path
-                    )
-                )
-            item.properties["publish_path"] = publish_path
-            item.properties["path"] = publish_path
-
-            # Remove the filename from the publish path
-            destination_path = os.path.dirname(publish_path)
-
-            # Stash the destination path in properties
-            item.properties["destination_path"] = destination_path
-
-            # Set the Published File Type
-            item.properties["publish_type"] = "Unreal FBX"
-
-            # run the base class validation
-            self.save_ui_settings(settings)
-            return True
+            publish_template.validate_and_get_fields(fields)
         except Exception as e:
-            self.logger.error(f"Error during validation: {str(e)}")
+            self.logger.error("Template validation failed: %s" % str(e))
             return False
+
+        return True
 
     def publish(self, settings, item):
         """
