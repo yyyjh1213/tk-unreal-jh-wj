@@ -186,9 +186,12 @@ class UnrealAssetPublishPlugin(HookBaseClass):
 
             fields = work_template.get_fields(path)
             
-            # Get next version number
-            fields["version"] = self._get_next_version_number(publish_template, fields)
-            item.properties["publish_version"] = fields["version"]
+            # Use the same version as the Maya scene file
+            maya_version = item.properties.get("publish_version", 1)
+            fields["version"] = maya_version
+            item.properties["publish_version"] = maya_version
+
+            self.logger.debug("Using Maya scene version: %d" % maya_version)
 
             # Update with the fields from the context
             fields.update(item.context.as_template_fields(publish_template))
@@ -265,6 +268,143 @@ class UnrealAssetPublishPlugin(HookBaseClass):
         
         # Let the base class register the publish
         super(UnrealAssetPublishPlugin, self).finalize(settings, item)
+
+class MayaAssetPublishPlugin(HookBaseClass):
+    """
+    Plugin for publishing a Maya asset.
+    """
+
+    @property
+    def description(self):
+        return """Publishes the Maya asset to Shotgun. A <b>Publish</b> entry will be
+        created in Shotgun which will include a reference to the exported asset's current
+        path on disk."""
+
+    @property
+    def settings(self):
+        base_settings = super(MayaAssetPublishPlugin, self).settings or {}
+        publish_template_setting = {
+            "Publish Template": {
+                "type": "template",
+                "default": None,
+                "description": "Template path for published work files. Should"
+                               "correspond to a template defined in "
+                               "templates.yml.",
+            },
+            "File Type": {
+                "type": "string",
+                "default": "FBX File",
+                "description": "The type of file to be created."
+            }
+        }
+        base_settings.update(publish_template_setting)
+        return base_settings
+
+    @property
+    def item_filters(self):
+        return ["maya.session"]
+
+    def accept(self, settings, item):
+        if item.type != "maya.session":
+            return {"accepted": False}
+            
+        # Make sure we have meshes in the scene
+        if not cmds.ls(type="mesh"):
+            self.logger.warn("No meshes found in the scene")
+            return {"accepted": False}
+            
+        return {"accepted": True}
+
+    def validate(self, settings, item):
+        """
+        Validates the given item to check that it is ok to publish.
+        """
+        publisher = self.parent
+        
+        # Get the path in a normalized state
+        path = sgtk.util.ShotgunPath.normalize(item.properties["path"])
+        
+        # Check that the FBX plugin is available
+        if not cmds.pluginInfo("fbxmaya", query=True, loaded=True):
+            try:
+                cmds.loadPlugin("fbxmaya")
+            except:
+                self.logger.error("Failed to load FBX plugin")
+                return False
+                
+        return True
+
+    def publish(self, settings, item):
+        publisher = self.parent
+        
+        # Get the path in a normalized state
+        path = sgtk.util.ShotgunPath.normalize(item.properties["path"])
+        
+        # Get fields from the current file path
+        template = publisher.get_template_by_name("maya_asset_work")
+        fields = template.get_fields(path)
+        
+        # Update version number
+        if "version" not in fields:
+            fields["version"] = 1
+        
+        # Get publish template
+        publish_template = publisher.get_template_by_name(settings["Publish Template"].value)
+        publish_path = publish_template.apply_fields(fields)
+        
+        # Ensure the publish folder exists
+        publish_folder = os.path.dirname(publish_path)
+        self.parent.ensure_folder_exists(publish_folder)
+        
+        # Export FBX
+        try:
+            self._maya_export_fbx(publish_path)
+            self.logger.info("FBX exported successfully to: %s" % publish_path)
+        except Exception as e:
+            self.logger.error("Failed to export FBX: %s" % e)
+            return False
+            
+        # Create the publish
+        publish_name = os.path.basename(publish_path)
+        publish_version = fields["version"]
+        publish_data = {
+            "tk": publisher.sgtk,
+            "context": item.context,
+            "comment": item.description,
+            "path": publish_path,
+            "name": publish_name,
+            "version_number": publish_version,
+            "created_by": item.get_property("user"),
+            "task": item.context.task,
+            "published_file_type": settings["File Type"].value,
+        }
+        
+        # Create the publish and return
+        tank.util.register_publish(**publish_data)
+        return True
+
+    def _maya_export_fbx(self, publish_path):
+        """FBX 내보내기 최적화 설정"""
+        # Reset FBX options to default
+        mel.eval('FBXResetExport')
+        
+        # Configure FBX export settings
+        mel.eval('FBXExportFileVersion -v FBX201800')
+        mel.eval('FBXExportUpAxis y')
+        mel.eval('FBXExportShapes -v true')
+        mel.eval('FBXExportSkins -v true')
+        mel.eval('FBXExportSmoothingGroups -v true')
+        mel.eval('FBXExportSmoothMesh -v true')
+        mel.eval('FBXExportTangents -v true')
+        mel.eval('FBXExportTriangulate -v false')
+        mel.eval('FBXExportConstraints -v false')
+        mel.eval('FBXExportCameras -v false')
+        mel.eval('FBXExportLights -v false')
+        mel.eval('FBXExportEmbeddedTextures -v false')
+        mel.eval('FBXExportInputConnections -v false')
+        
+        # Export FBX
+        mel.eval('FBXExport -f "{}" -s'.format(publish_path.replace('\\', '/')))
 
 def _unreal_export_asset_to_fbx(destination_path, asset_path, asset_name):
     """
