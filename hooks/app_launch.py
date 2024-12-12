@@ -70,14 +70,13 @@ class AppLaunch(tank.Hook):
 
         # Check department permissions
         depart_confirm = False
-        if depart and depart.get('name'):  
-            if (depart['name'] == 'RND' and engine_name == 'tk-nuke') or \
-               (depart['name'] in ['General']) or \
-               (engine_name in ['tk-unreal', 'tk-maya']):  
+        if engine_name in ['tk-unreal', 'tk-maya']:
+            # Unreal Engine과 Maya는 모든 부서 사용 가능
+            depart_confirm = True
+        elif depart and depart.get('name'):
+            if depart['name'] == 'RND' and engine_name == 'tk-nuke':
                 depart_confirm = True
-        else:
-            # Department 정보가 없는 경우 Unreal Engine과 Maya는 허용
-            if engine_name in ['tk-unreal', 'tk-maya']:
+            elif depart['name'] == 'General':
                 depart_confirm = True
 
         # Handle UE special case for Python 3
