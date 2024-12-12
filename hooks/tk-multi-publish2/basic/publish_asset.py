@@ -121,6 +121,28 @@ class UnrealAssetPublishPlugin(HookBaseClass):
 
         return False
 
+    def _get_next_version_number(self, path_template, fields):
+        """
+        Find the next available version number for a file.
+        
+        :param path_template: Template object to use to find next available version
+        :param fields: Dictionary of fields for the template
+        :returns: The next available version number
+        """
+        publisher = self.parent
+        
+        # Find all existing versions
+        existing_versions = []
+        try:
+            for existing_path in publisher.sgtk.paths_from_template(path_template, fields, skip_missing_optional_keys=True):
+                existing_fields = path_template.get_fields(existing_path)
+                existing_versions.append(existing_fields.get("version", 0))
+        except:
+            return 1  # If something goes wrong, just return 1
+            
+        # Find next version
+        return max(existing_versions or [0]) + 1
+
     def publish(self, settings, item):
         """
         Executes the publish logic for the given item and settings.
@@ -131,8 +153,7 @@ class UnrealAssetPublishPlugin(HookBaseClass):
         """
         publisher = self.parent
         
-        # Get the path in a normalized state. No trailing separator, separators are
-        # appropriate for current os, no double separators, etc.
+        # Get the path in a normalized state
         path = tank.util.ShotgunPath.normalize(item.properties["path"])
 
         # For Maya sessions, export FBX
@@ -150,7 +171,10 @@ class UnrealAssetPublishPlugin(HookBaseClass):
                 return False
 
             fields = work_template.get_fields(path)
-            fields["version"] = item.properties.get("publish_version", 1)
+            
+            # Get next version number
+            fields["version"] = self._get_next_version_number(publish_template, fields)
+            item.properties["publish_version"] = fields["version"]
 
             # Update with the fields from the context
             fields.update(item.context.as_template_fields(publish_template))
