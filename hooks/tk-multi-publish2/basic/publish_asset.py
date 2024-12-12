@@ -131,17 +131,31 @@ class UnrealAssetPublishPlugin(HookBaseClass):
         """
         publisher = self.parent
         
+        # Make a copy of the fields since we'll be modifying them
+        fields = fields.copy()
+        
+        # Remove the version field since we want to find all versions
+        fields.pop("version", None)
+        
+        self.logger.debug("Finding existing versions for template: %s" % path_template)
+        self.logger.debug("Fields for version query: %s" % fields)
+        
         # Find all existing versions
         existing_versions = []
         try:
             for existing_path in publisher.sgtk.paths_from_template(path_template, fields, skip_missing_optional_keys=True):
+                self.logger.debug("Found existing published file: %s" % existing_path)
                 existing_fields = path_template.get_fields(existing_path)
-                existing_versions.append(existing_fields.get("version", 0))
-        except:
-            return 1  # If something goes wrong, just return 1
+                version = existing_fields.get("version", 0)
+                existing_versions.append(version)
+                self.logger.debug(" - Version found: %d" % version)
+        except Exception as e:
+            self.logger.warning("Error finding versions: %s" % e)
+            return 1
             
-        # Find next version
-        return max(existing_versions or [0]) + 1
+        next_version = max(existing_versions or [0]) + 1
+        self.logger.debug("Next version number: %d" % next_version)
+        return next_version
 
     def publish(self, settings, item):
         """
