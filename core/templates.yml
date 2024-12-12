@@ -369,6 +369,10 @@ paths:
         definition: '@shot_root/pub/maya/{extension}/{name}.v{version}.{extension}'
         root_name: primary
 
+    maya_shot_fbx:
+        definition: '@shot_root/pub/fbx/{name}/v{version}/{Shot}_{name}_v{version}.fbx'
+        root_name: primary
+
     #
     # Houdini
     #

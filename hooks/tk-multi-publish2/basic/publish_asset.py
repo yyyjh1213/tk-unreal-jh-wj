@@ -1,13 +1,10 @@
-# This file is based on templates provided and copyrighted by Autodesk, Inc.
-# This file has been modified by Epic Games, Inc. and is subject to the license
-# file included in this repository.
-
 import tank
 import os
 import sys
 import unreal
 import datetime
-
+import maya.cmds as cmds
+import maya.mel as mel
 
 # Local storage path field for known Oses.
 _OS_LOCAL_STORAGE_PATH_FIELD = {
@@ -17,31 +14,15 @@ _OS_LOCAL_STORAGE_PATH_FIELD = {
     "linux2": "linux_path",
 }[sys.platform]
 
-
 HookBaseClass = tank.get_hook_baseclass()
-
 
 class UnrealAssetPublishPlugin(HookBaseClass):
     """
     Plugin for publishing an Unreal asset.
-
-    This hook relies on functionality found in the base file publisher hook in
-    the publish2 app and should inherit from it in the configuration. The hook
-    setting for this plugin should look something like this::
-
-        hook: "{self}/publish_file.py:{engine}/tk-multi-publish2/basic/publish_session.py"
-
-    To learn more about writing a publisher plugin, visit
-    http://developer.shotgunsoftware.com/tk-multi-publish2/plugin.html
     """
 
     @property
     def description(self):
-        """
-        Verbose, multi-line description of what the plugin does. This can
-        contain simple html for formatting.
-        """
-
         return """Publishes the asset to Shotgun. A <b>Publish</b> entry will be
         created in Shotgun which will include a reference to the exported asset's current
         path on disk. Other users will be able to access the published file via
@@ -50,28 +31,7 @@ class UnrealAssetPublishPlugin(HookBaseClass):
 
     @property
     def settings(self):
-        """
-        Dictionary defining the settings that this plugin expects to receive
-        through the settings parameter in the accept, validate, publish and
-        finalize methods.
-
-        A dictionary on the following form::
-
-            {
-                "Settings Name": {
-                    "type": "settings_type",
-                    "default": "default_value",
-                    "description": "One line description of the setting"
-            }
-
-        The type string should be one of the data types that toolkit accepts as
-        part of its environment configuration.
-        """
-
-        # inherit the settings from the base publish plugin
         base_settings = super(UnrealAssetPublishPlugin, self).settings or {}
-
-        # Here you can add any additional settings specific to this plugin
         publish_template_setting = {
             "Publish Template": {
                 "type": "template",
@@ -86,48 +46,30 @@ class UnrealAssetPublishPlugin(HookBaseClass):
                 "description": "Optional folder to use as a root for publishes"
             },
         }
-
-        # update the base settings
         base_settings.update(publish_template_setting)
-
         return base_settings
 
     @property
     def item_filters(self):
-        """
-        List of item types that this plugin is interested in.
-
-        Only items matching entries in this list will be presented to the
-        accept() method. Strings can contain glob patters such as *, for example
-        ["maya.*", "file.maya"]
-        """
-        return ["unreal.asset.StaticMesh"]
+        return ["unreal.asset.StaticMesh", "maya.session"]
 
     def accept(self, settings, item):
         """
-        Method called by the publisher to determine if an item is of any
-        interest to this plugin. Only items matching the filters defined via the
-        item_filters property will be presented to this method.
-
-        A publish task will be generated for each item accepted here. Returns a
-        dictionary with the following booleans:
-
-            - accepted: Indicates if the plugin is interested in this value at
-                all. Required.
-            - enabled: If True, the plugin will be enabled in the UI, otherwise
-                it will be disabled. Optional, True by default.
-            - visible: If True, the plugin will be visible in the UI, otherwise
-                it will be hidden. Optional, True by default.
-            - checked: If True, the plugin will be checked in the UI, otherwise
-                it will be unchecked. Optional, True by default.
-
-        :param settings: Dictionary of Settings. The keys are strings, matching
-            the keys returned in the settings property. The values are `Setting`
-            instances.
-        :param item: Item to process
-
-        :returns: dictionary with boolean keys accepted, required and enabled
+        Method called by the publisher to determine if an item is of any interest to this plugin.
         """
+        if item.type == "maya.session":
+            # Maya 세션인 경우 메시가 있는지 확인
+            meshes = cmds.ls(type="mesh", long=True)
+            if not meshes:
+                self.logger.warning("No meshes found in the Maya scene")
+                return {"accepted": False}
+            
+            # 메시 정보를 item properties에 저장
+            item.properties["meshes"] = meshes
+            return {
+                "accepted": True,
+                "checked": True
+            }
 
         # Get the publish template from the settings
         publish_template = settings["Publish Template"].value
@@ -138,12 +80,7 @@ class UnrealAssetPublishPlugin(HookBaseClass):
             self.logger.debug("No publish template set")
             return {"accepted": False}
 
-        # Get the path in a normalized state. no trailing separator,
-        # separators are appropriate for current os, no double separators,
-        # etc.
         path = tank.util.ShotgunPath.normalize(item.properties["path"])
-
-        # If there is an item source, apply the source to the item properties
         item_info = item.properties.get("item_info", {})
         item_source = item_info.get("source", None)
         if item_source:
@@ -156,45 +93,39 @@ class UnrealAssetPublishPlugin(HookBaseClass):
 
     def validate(self, settings, item):
         """
-        Validates the given item to check that it is ok to publish. Returns a
-        boolean to indicate validity.
-
-        :param settings: Dictionary of Settings. The keys are strings, matching
-            the keys returned in the settings property. The values are `Setting`
-            instances.
-        :param item: Item to process
-        :returns: True if item is valid, False otherwise.
+        Validates the given item to check that it is ok to publish.
         """
-        # context 정보 확인
-        context = item.context
+        if item.type == "maya.session":
+            # Maya 세션 유효성 검사
+            if not item.properties.get("meshes"):
+                self.logger.error("No meshes found to export")
+                return False
+            return True
 
-        # Asset 확인
+        # Unreal 에셋 유효성 검사
+        context = item.context
         if not context.entity or context.entity["type"] != "Asset":
             self.logger.error("Asset context is required for publishing")
             return False
 
-        # Template fields 확인
         publish_template = item.properties["publish_template"]
         if not publish_template:
             self.logger.error("No publish template defined")
             return False
 
-        # Asset 정보 확인
         asset_path = item.properties.get("asset_path")
         asset_name = item.properties.get("asset_name")
         if not asset_path or not asset_name:
             self.logger.error("Asset path or name not configured")
             return False
 
-        # Template fields 구성
         fields = {
             "name": asset_name,
             "Asset": context.entity["name"],
-            "Step": context.step["name"] if context.step else None,
-            "version": 1  # 기본값
+            "Step": context.step["name"] if context.step else "",
+            "version": 1,  # 기본값
         }
 
-        # Template fields 유효성 검사
         try:
             publish_template.validate_and_get_fields(fields)
         except Exception as e:
@@ -206,41 +137,103 @@ class UnrealAssetPublishPlugin(HookBaseClass):
     def publish(self, settings, item):
         """
         Executes the publish logic for the given item and settings.
-
-        :param settings: Dictionary of Settings. The keys are strings, matching
-            the keys returned in the settings property. The values are `Setting`
-            instances.
-        :param item: Item to process
         """
+        if item.type == "maya.session":
+            # Maya FBX 내보내기
+            return self._maya_export_fbx(settings, item)
+        else:
+            # Unreal 에셋 내보내기
+            return self._unreal_export_fbx(settings, item)
 
-        # Ensure that the destination path exists before exporting since the
-        # unreal API doesn't handle this.
-        destination_path = item.properties["destination_path"]
-        self.parent.ensure_folder_exists(destination_path)
-
-        # Export the asset to FBX
-        _unreal_export_asset_to_fbx(
-            destination_path,
-            item.properties["asset_path"],
-            item.properties["asset_name"]
-        )
-
-        # Let the base class register the publish
-        super(UnrealAssetPublishPlugin, self).publish(settings, item)
-
-    def finalize(self, settings, item):
+    def _maya_export_fbx(self, settings, item):
         """
-        Execute the finalization pass. This pass executes once all the publish
-        tasks have completed, and can for example be used to version up files.
-
-        :param settings: Dictionary of Settings. The keys are strings, matching
-            the keys returned in the settings property. The values are `Setting`
-            instances.
-        :param item: Item to process
+        Maya에서 FBX 파일로 내보내기
         """
-        # Do the base class finalization
-        super(UnrealAssetPublishPlugin, self).finalize(settings, item)
+        # 출력 경로 설정
+        publish_path = self._get_publish_path(settings, item)
+        publish_folder = os.path.dirname(publish_path)
+        self.parent.ensure_folder_exists(publish_folder)
 
+        # FBX 내보내기 옵션 설정
+        mel.eval('FBXResetExport')
+        mel.eval('FBXExportFileVersion -v FBX201800')
+        mel.eval('FBXExportUpAxis -v y')
+        mel.eval('FBXExportShapes -v true')
+        mel.eval('FBXExportSmoothingGroups -v true')
+        mel.eval('FBXExportSmoothMesh -v true')
+        mel.eval('FBXExportTangents -v true')
+        mel.eval('FBXExportInstances -v true')
+        mel.eval('FBXExportQuaternion -v euler')
+        mel.eval('FBXExportAnimation -v false')
+        mel.eval('FBXExportReferencedAssetsContent -v false')
+        mel.eval('FBXExportConstraints -v false')
+        mel.eval('FBXExportLights -v false')
+        mel.eval('FBXExportCameras -v false')
+        mel.eval('FBXExportBakeComplexAnimation -v false')
+
+        # FBX 내보내기 실행
+        try:
+            cmds.FBXExport('-f', publish_path)
+        except Exception as e:
+            self.logger.error("Failed to export FBX: %s" % str(e))
+            return False
+
+        # 퍼블리시 등록
+        self._register_publish(settings, item, publish_path)
+        return True
+
+    def _unreal_export_fbx(self, settings, item):
+        """
+        Unreal에서 FBX 파일로 내보내기
+        """
+        publish_path = self._get_publish_path(settings, item)
+        publish_folder = os.path.dirname(publish_path)
+        self.parent.ensure_folder_exists(publish_folder)
+
+        asset_path = item.properties["asset_path"]
+        asset_name = item.properties["asset_name"]
+
+        if _unreal_export_asset_to_fbx(publish_folder, asset_path, asset_name):
+            self._register_publish(settings, item, publish_path)
+            return True
+        return False
+
+    def _get_publish_path(self, settings, item):
+        """
+        퍼블리시 경로 생성
+        """
+        publish_template = item.properties["publish_template"]
+        fields = {
+            "name": item.properties.get("asset_name", ""),
+            "Asset": item.context.entity["name"],
+            "Step": item.context.step["name"] if item.context.step else "",
+            "version": 1,
+        }
+        return publish_template.apply_fields(fields)
+
+    def _register_publish(self, settings, item, path):
+        """
+        퍼블리시 등록
+        """
+        publisher = self.parent
+        path = tank.util.ShotgunPath.normalize(path)
+
+        # 퍼블리시 등록
+        publish_data = {
+            "tk": publisher.sgtk,
+            "context": item.context,
+            "comment": item.description,
+            "path": path,
+            "name": os.path.basename(path),
+            "created_by": item.get_property("user"),
+            "version_number": item.get_property("version_number", 1),
+            "thumbnail_path": item.get_thumbnail_as_path(),
+            "published_file_type": item.get_property("published_file_type"),
+            "dependency_paths": item.get_property("dependency_paths", []),
+        }
+
+        # 퍼블리시 실행
+        publisher.publish_file(**publish_data)
 
 def _unreal_export_asset_to_fbx(destination_path, asset_path, asset_name):
     """
@@ -258,7 +251,6 @@ def _unreal_export_asset_to_fbx(destination_path, asset_path, asset_name):
         [export_task],
         False  # Don't show the export options dialog
     )
-
 
 def _generate_fbx_export_task(destination_path, asset_path, asset_name):
     """

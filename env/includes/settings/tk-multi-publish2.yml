@@ -178,6 +178,10 @@ settings.tk-multi-publish2.maya.asset_step:
     hook: "{self}/publish_file.py:{engine}/tk-multi-publish2/basic/publish_session.py"
     settings:
         Publish Template: maya_asset_publish
+  - name: Export FBX for Unreal
+    hook: "{self}/publish_file.py:{config}/tk-multi-publish2/basic/publish_asset.py"
+    settings:
+        Publish Template: maya_asset_publish_fbx
   help_url: *help_url
   location: "@apps.tk-multi-publish2.location"
 
@@ -200,6 +204,10 @@ settings.tk-multi-publish2.maya.shot_step:
     hook: "{self}/publish_file.py:{engine}/tk-multi-publish2/basic/publish_session.py"
     settings:
         Publish Template: maya_shot_publish
+  - name: Export FBX for Unreal
+    hook: "{self}/publish_file.py:{config}/tk-multi-publish2/basic/publish_asset.py"
+    settings:
+        Publish Template: maya_shot_fbx
   help_url: *help_url
   location: "@apps.tk-multi-publish2.location"
 
