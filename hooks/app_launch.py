@@ -32,7 +32,6 @@ ENGINES = {
 }
 
 
-
 class AppLaunch(tank.Hook):
     """
     Hook to run an application.

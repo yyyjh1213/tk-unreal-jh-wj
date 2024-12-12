@@ -218,25 +218,15 @@ class UnrealAssetPublishPlugin(HookBaseClass):
         :param item: Item to process
         :param path: Path of the published file
         """
-        publisher = self.parent
-        path = tank.util.ShotgunPath.normalize(path)
+        # Get the publish "type" from the settings
+        publish_type = settings.get("File Type").value
 
-        # Create the publish data
-        publish_data = {
-            "tk": publisher.sgtk,
-            "context": item.context,
-            "comment": item.description,
-            "path": path,
-            "name": os.path.basename(path),
-            "created_by": item.get_property("user"),
-            "version_number": item.get_property("version_number", 1),
-            "thumbnail_path": item.get_thumbnail_as_path(),
-            "published_file_type": item.get_property("published_file_type"),
-            "dependency_paths": item.get_property("dependency_paths", []),
-        }
-
-        # Register the publish
-        publisher.publish_file(**publish_data)
+        # Update the item properties
+        item.properties["publish_type"] = publish_type
+        item.properties["path"] = path
+        
+        # Let the base class register the publish
+        super(UnrealAssetPublishPlugin, self).finalize(settings, item)
 
 def _unreal_export_asset_to_fbx(destination_path, asset_path, asset_name):
     """
