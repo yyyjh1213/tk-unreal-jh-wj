@@ -2,7 +2,7 @@
 # This file has been modified by Epic Games, Inc. and is subject to the license
 # file included in this repository.
 
-import sgtk
+import tank
 import os
 import sys
 import unreal
@@ -18,7 +18,7 @@ _OS_LOCAL_STORAGE_PATH_FIELD = {
 }[sys.platform]
 
 
-HookBaseClass = sgtk.get_hook_baseclass()
+HookBaseClass = tank.get_hook_baseclass()
 
 
 class UnrealAssetPublishPlugin(HookBaseClass):
@@ -141,7 +141,7 @@ class UnrealAssetPublishPlugin(HookBaseClass):
         # Get the path in a normalized state. no trailing separator,
         # separators are appropriate for current os, no double separators,
         # etc.
-        path = sgtk.util.ShotgunPath.normalize(item.properties["path"])
+        path = tank.util.ShotgunPath.normalize(item.properties["path"])
 
         # If there is an item source, apply the source to the item properties
         item_info = item.properties.get("item_info", {})

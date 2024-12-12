@@ -21,7 +21,6 @@ import platform
 import tank
 
 
-
 ENGINES = {
     'tk-houdini' : 'houdini',
     'tk-maya' : 'maya',
