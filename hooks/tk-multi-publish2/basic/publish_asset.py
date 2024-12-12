@@ -242,8 +242,8 @@ class UnrealAssetPublishPlugin(HookBaseClass):
         :param item: Item to process
         :param path: Path of the published file
         """
-        # Get the publish "type" from the settings
-        publish_type = settings.get("File Type").value
+        # Get the publish "type" from the settings or use a default
+        publish_type = (settings.get("File Type") or {}).get("value", "FBX File")
 
         # Update the item properties
         item.properties["publish_type"] = publish_type
