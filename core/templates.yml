@@ -134,12 +134,13 @@ keys:
         type: str
         shotgun_entity_type: Task
         shotgun_field_name: content
-    # Maya supports two extension types.
+    # Maya supports three extension types.
     maya_extension:
         type: str
         choices:
             ma: Maya Ascii (.ma)
             mb: Maya Binary (.mb)
+            fbx: FBX (.fbx)
         default: mb
         alias: extension
     tail:

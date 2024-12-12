@@ -32,7 +32,4 @@ path.linux.rv: "rv"
 path.mac.rv: "/Applications/RV.app"
 path.windows.rv: C:\Program Files\Shotgun\RV-7.9.0\bin\rv.exe
 
-# Maya
-# 샷건 데스크탑에서 실행할 때 갑자기 마야가 안되서보니 
-# app_launch.py 코드 수정으로 인해 maya를 인식못함. 그래서 강제로 설치경로 지정해줌.
-path.windows.maya: C:\Program Files\Autodesk\Maya2024\bin\maya.exe 
+
